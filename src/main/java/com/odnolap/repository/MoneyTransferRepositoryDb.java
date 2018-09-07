@@ -15,6 +15,33 @@ import java.util.List;
 public class MoneyTransferRepositoryDb implements MoneyTransferRepository {
 
     @Override
+    public List<MoneyTransferTransaction> getTransaction(Long transactionId) {
+        ArrayList<MoneyTransferTransaction> result = new ArrayList<>();
+        // TODO
+        // Just for test
+        float eurToGbpTestRate = 0.87f;
+        MoneyTransferTransaction transaction = new MoneyTransferTransaction();
+        transaction.setAccountFromId(transactionId * 5);
+        transaction.setAccountToId(transactionId * 2);
+        transaction.setAmountFrom((float)(transactionId % 1000));
+        transaction.setAmountTo((transactionId % 1000) * eurToGbpTestRate);
+        transaction.setCurrencyFrom(Currency.EUR);
+        transaction.setCurrencyTo(Currency.GBP);
+        transaction.setCreationTimestamp(System.currentTimeMillis() - 1000000);
+        transaction.setFinalizationTimestamp(System.currentTimeMillis() - 900000);
+        transaction.setDescription("Test Transaction (by id)");
+        transaction.setStatus(MoneyTransferTransactionStatus.SUCCESFUL);
+        transaction.setId(transactionId);
+        ExchangeRate exchangeRate = new ExchangeRate(122L, Currency.EUR, Currency.GBP, eurToGbpTestRate, System.currentTimeMillis() - 10000000, null);
+        transaction.setExchangeRate(exchangeRate);
+
+        result.add(transaction);
+
+        return result;
+
+    }
+
+    @Override
     public List<MoneyTransferTransaction> getAccountTransactions(Long accountId) {
         ArrayList<MoneyTransferTransaction> result = new ArrayList<>();
         // TODO
@@ -29,7 +56,7 @@ public class MoneyTransferRepositoryDb implements MoneyTransferRepository {
         transaction.setCurrencyTo(Currency.GBP);
         transaction.setCreationTimestamp(System.currentTimeMillis() - 1000000);
         transaction.setFinalizationTimestamp(System.currentTimeMillis() - 900000);
-        transaction.setDescription("Test Transaction");
+        transaction.setDescription("Test Transaction (by account id)");
         transaction.setStatus(MoneyTransferTransactionStatus.SUCCESFUL);
         transaction.setId(accountId * 4);
         ExchangeRate exchangeRate = new ExchangeRate(122L, Currency.EUR, Currency.GBP, eurToGbpTestRate, System.currentTimeMillis() - 10000000, null);
@@ -55,7 +82,7 @@ public class MoneyTransferRepositoryDb implements MoneyTransferRepository {
         transaction.setCurrencyTo(Currency.GBP);
         transaction.setCreationTimestamp(System.currentTimeMillis() - 1000000);
         transaction.setFinalizationTimestamp(System.currentTimeMillis() - 900000);
-        transaction.setDescription("Test Transaction");
+        transaction.setDescription("Test Transaction (by customer id)");
         transaction.setStatus(MoneyTransferTransactionStatus.SUCCESFUL);
         transaction.setId(customerId * 4);
         ExchangeRate exchangeRate = new ExchangeRate(122L, Currency.EUR, Currency.GBP, eurToGbpTestRate, System.currentTimeMillis() - 10000000, null);

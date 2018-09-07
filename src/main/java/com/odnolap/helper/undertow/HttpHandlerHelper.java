@@ -1,11 +1,11 @@
 package com.odnolap.helper.undertow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odnolap.model.undertow.ErrorResponse;
 import com.odnolap.model.undertow.JsonHttpHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.MimeMappings;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 import java.util.function.Function;
 
-import static com.odnolap.helper.undertow.RequestHelper.BASE_MAPPER;
+import static com.odnolap.helper.undertow.RequestHelper.MAPPER;
 
 @Slf4j
 public class HttpHandlerHelper {
@@ -25,20 +25,32 @@ public class HttpHandlerHelper {
         };
     }
 
+    public static HttpHandler jsonBlockingHttpHandler(Function<HttpServerExchange, Object> function) {
+        return wrapToBlockingHadnler(jsonHttpHandler(function));
+    }
+
+    public static HttpHandler jsonBlockingHttpHandler(Function<HttpServerExchange, Object> function, Integer successCode) {
+        return wrapToBlockingHadnler(jsonHttpHandler(function, successCode));
+    }
+
     public static HttpHandler jsonHttpHandler(Function<HttpServerExchange, Object> function) {
         return new JsonHttpHandler(function);
     }
 
-    public static HttpHandler jsonHttpHandler(Function<HttpServerExchange, Object> function, ObjectMapper mapper) {
-        return new JsonHttpHandler(function, mapper);
+    public static HttpHandler jsonHttpHandler(Function<HttpServerExchange, Object> function, Integer successCode) {
+        return new JsonHttpHandler(function, successCode);
     }
 
     public static void notFoundHandler(HttpServerExchange exchange) throws JsonProcessingException {
         String errorMessage = "Page not found!";
         UUID uuid = UUID.randomUUID();
         log.error("{}; error UUID: {}", errorMessage, uuid);
+        exchange.setStatusCode(404)
+            .getResponseSender()
+            .send(MAPPER.writeValueAsString(new ErrorResponse(404, uuid, errorMessage)));
+    }
 
-        exchange.getResponseSender()
-            .send(BASE_MAPPER.writeValueAsString(new ErrorResponse(404, uuid, errorMessage)));
+    public static HttpHandler wrapToBlockingHadnler(HttpHandler handler) {
+        return new BlockingHandler(handler);
     }
 }

@@ -1,16 +1,13 @@
 package com.odnolap.service;
 
-import com.odnolap.model.GetTransactionRequest;
-import com.odnolap.model.MoneyTransferRequest;
+import com.odnolap.model.GetTransactionsRequest;
+import com.odnolap.model.GetTransactionsResponse;
 import com.odnolap.model.NewTransactionRequest;
 import com.odnolap.model.db.MoneyTransferTransaction;
-import com.odnolap.model.db.MoneyTransferTransactionStatus;
-
-import java.util.List;
 
 public interface MoneyTransferService {
 
-    List<MoneyTransferTransaction> getTransactions(GetTransactionRequest request);
+    GetTransactionsResponse getTransactions(GetTransactionsRequest request);
 
     MoneyTransferTransaction createMoneyTransferTransaction(NewTransactionRequest request);
 }

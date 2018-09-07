@@ -1,6 +1,7 @@
 package com.odnolap.service;
 
-import com.odnolap.model.GetTransactionRequest;
+import com.odnolap.model.GetTransactionsRequest;
+import com.odnolap.model.GetTransactionsResponse;
 import com.odnolap.model.NewTransactionRequest;
 import com.odnolap.model.db.MoneyTransferTransaction;
 import com.odnolap.model.db.MoneyTransferTransactionStatus;
@@ -10,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collections;
-import java.util.List;
 
 @Singleton
 @Slf4j
@@ -19,14 +19,18 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
     @Inject
     private MoneyTransferRepository repository;
 
-    public List<MoneyTransferTransaction> getTransactions(GetTransactionRequest request) {
-        if (request.getAccountId() != null) {
-            return repository.getAccountTransactions(request.getAccountId());
+    public GetTransactionsResponse getTransactions(GetTransactionsRequest request) {
+        GetTransactionsResponse result = new GetTransactionsResponse();
+        if (request.getTransactionId() != null) {
+            result.setTransactions(repository.getTransaction(request.getTransactionId()));
+        } else if (request.getAccountId() != null) {
+            result.setTransactions(repository.getAccountTransactions(request.getAccountId()));
         } else if (request.getCustomerId() != null) {
-            return repository.getCustomerTransactions(request.getCustomerId());
+            result.setTransactions(repository.getCustomerTransactions(request.getCustomerId()));
         } else {
-            return Collections.emptyList();
+            result.setTransactions(Collections.emptyList());
         }
+        return result;
     }
 
     @Override
