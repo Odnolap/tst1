@@ -8,4 +8,6 @@ public class Account {
     private Customer customer;
     private Currency currency;
     private Float balance;
+    private boolean isDefault;
+    private boolean isActive;
 }

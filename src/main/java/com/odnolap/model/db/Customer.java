@@ -11,4 +11,5 @@ public class Customer {
     private Country country;
     private String idCardNumber;
     private String address;
+    private boolean isActive;
 }

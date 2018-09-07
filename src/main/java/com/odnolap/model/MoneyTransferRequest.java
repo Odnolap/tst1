@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class MoneyTransferRequest {
     private Long accountFromId;
-    private Long accountToId;
+    private Long customerToId;
     private Currency currencyFrom;
     private Float amountFrom;
     private Currency currencyTo;

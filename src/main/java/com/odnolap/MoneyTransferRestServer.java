@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import com.odnolap.config.AppInjector;
 import com.odnolap.helper.undertow.HttpHandlerHelper;
 import com.odnolap.helper.undertow.RequestHelper;
+import com.odnolap.model.MoneyTransferRequest;
 import com.odnolap.model.undertow.SimpleServer;
 import com.odnolap.model.undertow.Slf4jAccessLogReceiver;
 import com.odnolap.service.MoneyTransferService;
@@ -14,7 +15,6 @@ import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.accesslog.AccessLogHandler;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
@@ -42,19 +42,17 @@ public class MoneyTransferRestServer {
 
     private static HttpHandler initRoot(MoneyTransferService service) {
         String rootDescription = "It's just a test server!\n"
-            + "Try to get /accountTransaction?accountId=123 for example.";
+            + "Try to get /transaction?accountId=123 or /transaction?customerId=456 for example.";
 
         HttpHandler routes = new RoutingHandler()
             .get("/", HttpHandlerHelper.simpleTextHandler(rootDescription))
-            .get("/accountTransaction", HttpHandlerHelper.jsonHttpHandler(getAccountTransactionHandlerFunction(service)))
-
-//        .get("/myRoute", HttpHandlerHelper.constantStringHandler("GET - My Route"))
-//        .post("/myRoute", HttpHandlerHelper.constantStringHandler("POST - My Route"))
-//        .get("/myOtherRoute", HttpHandlerHelper.constantStringHandler("GET - My Other Route"))
-            // Wildcards and RoutingHandler had some bugs before version 1.4.8.Final
-//        .get("/myRoutePrefix*", HttpHandlerHelper.constantStringHandler("GET - My Prefixed Route"))
-            // Pass a handler as a method reference.
-            .setFallbackHandler(HttpHandlerHelper.getNotFoundHandler())
+            .get("/transaction", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> service.getTransactions(RequestHelper.createGetTransactionRequest(exchange)))
+            )
+            .post("/transaction",
+                exchange -> service.createMoneyTransferTransaction(RequestHelper.createNewTransactionRequest(exchange))
+            )
+            .setFallbackHandler(HttpHandlerHelper::notFoundHandler)
             ;
 
         return new AccessLogHandler(
@@ -63,20 +61,5 @@ public class MoneyTransferRestServer {
             "combined",
             MoneyTransferRestServer.class.getClassLoader())
         ;
-    }
-
-    private static Function<HttpServerExchange, Object> getAccountTransactionHandlerFunction(MoneyTransferService service) {
-        return exchange -> {
-            String accountIdStr = RequestHelper.getParamFirstValue(exchange, "accountId");
-            if (StringUtils.isBlank(accountIdStr)) {
-                throw new IllegalArgumentException("Empty accountId param.");
-            }
-            try {
-                return service.getAccountTransactions(Long.valueOf(accountIdStr));
-            } catch (NumberFormatException ex) {
-                throw new IllegalArgumentException("Parameter accountId has invalid integer format \""
-                    + accountIdStr + "\"", ex);
-            }
-        };
     }
 }

@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.UUID;
 import java.util.function.Function;
 
+import static com.odnolap.helper.undertow.RequestHelper.BASE_MAPPER;
+
 @Slf4j
 public class HttpHandlerHelper {
     public static HttpHandler simpleTextHandler(String value) {
@@ -31,12 +33,12 @@ public class HttpHandlerHelper {
         return new JsonHttpHandler(function, mapper);
     }
 
-    public static HttpHandler getNotFoundHandler() {
-        return new JsonHttpHandler(exchange -> {
-            String errorMessage = "Page not found!";
-            UUID uuid = UUID.randomUUID();
-            log.error("{}; error UUID: {}", errorMessage, uuid);
-            return new ErrorResponse(404, uuid, errorMessage);
-        });
+    public static void notFoundHandler(HttpServerExchange exchange) throws JsonProcessingException {
+        String errorMessage = "Page not found!";
+        UUID uuid = UUID.randomUUID();
+        log.error("{}; error UUID: {}", errorMessage, uuid);
+
+        exchange.getResponseSender()
+            .send(BASE_MAPPER.writeValueAsString(new ErrorResponse(404, uuid, errorMessage)));
     }
 }
