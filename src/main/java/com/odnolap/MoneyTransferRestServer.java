@@ -41,7 +41,11 @@ public class MoneyTransferRestServer {
 
     private static HttpHandler initRoot(MoneyTransferService service) {
         String rootDescription = "It's just a test server!\n"
-            + "Try to get /v1/transactions?accountId=123 or /v1/transactions?customerId=456 for example.";
+            + "Try to get /v1/transactions?accountId=123 or /v1/transactions?customerId=456 "
+            + "or /v1/transactions/555 for example.\n"
+            + "Available endpoints:\n"
+            + "- /v1/transactions (GET, POST)\n"
+            + "- /v1/transactions/{id} (GET)\n";
 
         HttpHandler routes = new RoutingHandler()
             .get("/", HttpHandlerHelper.simpleTextHandler(rootDescription))

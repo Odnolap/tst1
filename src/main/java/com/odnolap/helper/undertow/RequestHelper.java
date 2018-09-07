@@ -35,6 +35,10 @@ public class RequestHelper {
     private static final String ACCOUNT_ID_PARAM = "accountId";
     private static final String CUSTOMER_ID_PARAM = "customerId";
 
+    private static final String PAGE_NUMBER = "page";
+    private static final String OFFSET = "offset";
+    private static final int DEFAULT_OFFSET = 10;
+
     public static GetTransactionsRequest createGetTransactionRequest(HttpServerExchange exchange) {
         String idStr = getParamFirstValue(exchange, ID); // Located in path but stored in exchange.getQueryParameters
         String accountIdStr = getParamFirstValue(exchange, ACCOUNT_ID_PARAM);
@@ -42,6 +46,7 @@ public class RequestHelper {
 
         GetTransactionsRequest result = new GetTransactionsRequest();
         boolean parseSuccessful = false;
+        // id
         if (StringUtils.isNotBlank(idStr)) {
             try {
                 result.setTransactionId(Long.valueOf(idStr));
@@ -51,6 +56,7 @@ public class RequestHelper {
             }
             parseSuccessful = true;
         }
+        // accountId
         if (StringUtils.isNotBlank(accountIdStr)) {
             try {
                 result.setAccountId(Long.valueOf(accountIdStr));
@@ -60,6 +66,7 @@ public class RequestHelper {
             }
             parseSuccessful = true;
         }
+        // customerId
         if (StringUtils.isNotBlank(customerIdStr)) {
             try {
                 result.setCustomerId(Long.valueOf(customerIdStr));
@@ -70,10 +77,30 @@ public class RequestHelper {
             parseSuccessful = true;
         }
 
+        // There should be at least one of id, accountId or customerId
         if (!parseSuccessful) {
-            throw new RequestParsingException("You sent GET request. There is no " + ID + "in path and empty \""
+            throw new RequestParsingException("You've sent GET request. There is no " + ID + "in path and empty \""
                 + ACCOUNT_ID_PARAM + "\" and \"" + CUSTOMER_ID_PARAM + "\" params.");
         } else {
+            // offset
+            String offsetStr = getParamFirstValue(exchange, OFFSET);
+            int offset;
+            try {
+                offset = Integer.parseInt(offsetStr);
+            } catch (NumberFormatException ex) {
+                offset = DEFAULT_OFFSET;
+            }
+            result.setOffset(offset);
+
+            // startFrom
+            String pageStr = getParamFirstValue(exchange, PAGE_NUMBER);
+            int page;
+            try {
+                page = Integer.parseInt(pageStr);
+                result.setStartFrom(page * offset);
+            } catch (NumberFormatException ignored) {
+            }
+
             return result;
         }
     }
