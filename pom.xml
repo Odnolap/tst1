@@ -7,32 +7,21 @@
     <groupId>com.odnolap</groupId>
     <artifactId>tst1</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <packaging>jar</packaging>
     <name>Test 1</name>
 
     <properties>
         <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.2</lombok.version>
         <undertow.version>2.0.13.Final</undertow.version>
         <jackson.version>2.9.6</jackson.version>
         <guice.version>4.2.0</guice.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.core.version>1.2.3</logback.core.version>
-        <!--<okhttp.version>3.11.0</okhttp.version>-->
         <commons.lang.version>3.8</commons.lang.version>
         <commons.collections4.version>4.2</commons.collections4.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <dependencies>
@@ -51,11 +40,6 @@
             <artifactId>guice</artifactId>
             <version>${guice.version}</version>
         </dependency>
-        <!--<dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
-        </dependency>-->
 
         <!--Jackson-->
         <dependency>
@@ -98,7 +82,64 @@
             <version>${commons.collections4.version}</version>
         </dependency>
 
+        <!--Test-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.odnolap.tst1.Application</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Built-By>Evgeny Balanda</Built-By>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     
 </project>
