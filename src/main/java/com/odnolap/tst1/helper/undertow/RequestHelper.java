@@ -3,6 +3,8 @@ package com.odnolap.tst1.helper.undertow;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.odnolap.tst1.model.NewTransactionRequest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.MoneyTransferRequest;
@@ -29,6 +31,10 @@ public class RequestHelper {
 
         // Ignore null values when writing json.
         MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        // Write times as a String instead of a Long so its human readable.
+        MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        MAPPER.registerModule(new JavaTimeModule());
     }
 
     private static final String ID = "id";

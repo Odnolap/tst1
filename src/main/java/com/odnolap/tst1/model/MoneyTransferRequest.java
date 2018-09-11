@@ -9,7 +9,6 @@ import lombok.Data;
 public class MoneyTransferRequest {
     private Long accountFromId;
     private Long customerToId;
-    private Currency currencyFrom;
     private Float amountFrom;
     private Currency currencyTo;
 }

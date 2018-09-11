@@ -23,9 +23,10 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
 
     @Test
     public void getTransactionsByAccountId() {
-        long expectedAccId = 123L;
+        long expectedAccId = 11L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setAccountId(expectedAccId);
+        request.setOffset(10);
         GetTransactionsResponse transactions = service.getTransactions(request);
         assertEquals(expectedAccId, transactions.getTransactions().iterator().next().getAccountFromId().longValue());
     }
@@ -33,14 +34,15 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     @Test
     public void getTransactionsByCustomerId() {
         GetTransactionsRequest request = new GetTransactionsRequest();
-        request.setCustomerId(100L);
+        request.setCustomerId(1L);
+        request.setOffset(10);
         GetTransactionsResponse transactions = service.getTransactions(request);
-        assertEquals(400L, transactions.getTransactions().iterator().next().getId().longValue());
+        assertEquals(1005L, transactions.getTransactions().iterator().next().getId().longValue());
     }
 
     @Test
     public void getTransactionsById() {
-        long expectedTransactionId = 555L;
+        long expectedTransactionId = 1004L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setTransactionId(expectedTransactionId);
         GetTransactionsResponse transactions = service.getTransactions(request);
@@ -51,6 +53,6 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     public void createMoneyTransferTransaction() {
         MoneyTransferRequest request = new MoneyTransferRequest();
         MoneyTransferTransaction response = service.createMoneyTransferTransaction(new NewTransactionRequest(request));
-        assertEquals(MoneyTransferTransactionStatus.SUCCESFUL, response.getStatus());
+        assertEquals(MoneyTransferTransactionStatus.SUCCESSFUL, response.getStatus());
     }
 }

@@ -8,6 +8,7 @@ import com.odnolap.tst1.helper.undertow.HttpHandlerHelper;
 import com.odnolap.tst1.helper.undertow.RequestHelper;
 import com.odnolap.tst1.model.undertow.SimpleServer;
 import com.odnolap.tst1.model.undertow.Slf4jAccessLogReceiver;
+import com.odnolap.tst1.repository.MoneyTransferRepository;
 import com.odnolap.tst1.service.MoneyTransferService;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -18,16 +19,18 @@ import io.undertow.util.MimeMappings;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 @Slf4j
 public class MoneyTransferRestServer {
     private static volatile boolean isServerRun;
+    private static Injector injector;
     private static Undertow server;
 
     public static synchronized void startServer() {
         if (!isServerRun) {
-            Injector injector = Guice.createInjector(new AppInjector());
+            injector = Guice.createInjector(new AppInjector());
             MoneyTransferService service = injector.getInstance(MoneyTransferService.class);
             HttpHandler root = initRoot(service);
             server = SimpleServer.simpleServer(root).start();
@@ -38,8 +41,9 @@ public class MoneyTransferRestServer {
 
     private static HttpHandler initRoot(MoneyTransferService service) {
         String rootDescription = "It's just a test server!\n"
-            + "Try to get /v1/transactions?accountId=123 or /v1/transactions?customerId=456 "
-            + "or /v1/transactions/555 for example.\n"
+            + "Try to get localhost:8080/v1/transactions?accountId=11&page=0&offset=10 or "
+            + "localhost:8080/v1/transactions?cusTOmeRId=1&page=1&offset=2 "
+            + "or localhost:8080/v1/transactions/1003 for example.\n"
             + "Available endpoints:\n"
             + "- /v1/transactions (GET, POST)\n"
             + "- /v1/transactions/{id} (GET)\n";
@@ -73,7 +77,7 @@ public class MoneyTransferRestServer {
         ;
     }
 
-    static void quit() throws SQLException {
+    static void quit() throws SQLException, IOException {
         log.info("Stopping application.");
         DbHelper.shutdownDb();
         server.stop();

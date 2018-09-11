@@ -7,7 +7,6 @@ import lombok.Data;
 public class NewTransactionRequest {
     private Long accountFromId;
     private Long customerToId;
-    private Currency currencyFrom;
     private Float amountFrom;
     private Currency currencyTo;
     private Long creationTimestamp;
@@ -15,7 +14,6 @@ public class NewTransactionRequest {
     public NewTransactionRequest(MoneyTransferRequest moneyTransferRequest) {
         accountFromId = moneyTransferRequest.getAccountFromId();
         customerToId = moneyTransferRequest.getCustomerToId();
-        currencyFrom = moneyTransferRequest.getCurrencyFrom();
         amountFrom = moneyTransferRequest.getAmountFrom();
         currencyTo = moneyTransferRequest.getCurrencyTo();
         creationTimestamp = System.currentTimeMillis();

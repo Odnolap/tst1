@@ -20,19 +20,19 @@ public class MoneyTransferRepositoryTest extends BaseUnitTest {
 
     @Test
     public void getTransactionsByAccountId() {
-        List<MoneyTransferTransaction> transactions = repository.getAccountTransactions(1234L);
+        List<MoneyTransferTransaction> transactions = repository.getAccountTransactions(1234L, 0, 10);
 //        System.out.println("accId: " + transactions.iterator().next().getAccountFromId());
     }
 
     @Test
     public void getTransactionsByCustomerId() {
-        List<MoneyTransferTransaction> transactions = repository.getCustomerTransactions(4567L);
+        List<MoneyTransferTransaction> transactions = repository.getCustomerTransactions(4567L, 0, 10);
 //        System.out.println("description: " + transactions.iterator().next().getDescription());
     }
 
     @Test
     public void getTransactionsById() {
-        List<MoneyTransferTransaction> transactions = repository.getTransaction(5555L);
+        MoneyTransferTransaction transaction = repository.getTransaction(1004L);
 //        System.out.println("transactionId: " + transactions.iterator().next().getId());
     }
 

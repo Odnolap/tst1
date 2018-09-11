@@ -1,4 +1,0 @@
-id,first_name,last_name,patronymic_name,email,id_card_number,registered,is_active
-1,Bill,Gates,,bill.gates@ms.com,233149,2018-08-22 13:00:00,true
-2,Melinda,Gates,,melinda.gates@ms.com,287392,2018-08-22 13:10:00,true
-3,Bill,Klinton,,bklinton@expresidents.gov,589932,2018-08-22 14:00:00,true

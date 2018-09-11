@@ -23,6 +23,8 @@
         <commons.collections4.version>4.2</commons.collections4.version>
         <junit.version>4.12</junit.version>
         <h2.version>1.4.197</h2.version>
+        <hibernate-core.version>5.3.6.Final</hibernate-core.version>
+        <hibernate-validator.version>6.0.12.Final</hibernate-validator.version>
     </properties>
 
     <dependencies>
@@ -88,6 +90,16 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
         </dependency>
 
 
