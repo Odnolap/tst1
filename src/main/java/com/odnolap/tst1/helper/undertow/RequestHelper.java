@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.odnolap.tst1.helper.PropertiesHelper;
 import com.odnolap.tst1.model.NewTransactionRequest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.MoneyTransferRequest;
 import com.odnolap.tst1.model.exceptions.RequestParsingException;
 import io.undertow.server.HttpServerExchange;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,9 +20,11 @@ import java.util.Deque;
 import java.util.Optional;
 import java.util.TreeMap;
 
+@Slf4j
 public class RequestHelper {
 
     public static final ObjectMapper MAPPER;
+    private static int DEFAULT_OFFSET = 10;
     static {
         MAPPER = new ObjectMapper();
 
@@ -35,6 +39,13 @@ public class RequestHelper {
         // Write times as a String instead of a Long so its human readable.
         MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         MAPPER.registerModule(new JavaTimeModule());
+
+        try {
+            DEFAULT_OFFSET = (Integer) PropertiesHelper.getProperty("default.offset");
+        } catch (NumberFormatException | ClassCastException ex) {
+            DEFAULT_OFFSET = 10;
+        }
+
     }
 
     private static final String ID = "id";
@@ -43,7 +54,6 @@ public class RequestHelper {
 
     private static final String PAGE_NUMBER = "page";
     private static final String OFFSET = "offset";
-    private static final int DEFAULT_OFFSET = 10;
 
     public static GetTransactionsRequest createGetTransactionRequest(HttpServerExchange exchange) {
         String idStr = getParamFirstValue(exchange, ID); // Located in path but stored in exchange.getQueryParameters

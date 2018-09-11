@@ -8,7 +8,6 @@ import com.odnolap.tst1.helper.undertow.HttpHandlerHelper;
 import com.odnolap.tst1.helper.undertow.RequestHelper;
 import com.odnolap.tst1.model.undertow.SimpleServer;
 import com.odnolap.tst1.model.undertow.Slf4jAccessLogReceiver;
-import com.odnolap.tst1.repository.MoneyTransferRepository;
 import com.odnolap.tst1.service.MoneyTransferService;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -63,7 +62,7 @@ public class MoneyTransferRestServer {
             .get("/v1/quit", exchange -> {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE,
                     MimeMappings.DEFAULT_MIME_MAPPINGS.get("txt"));
-                exchange.getResponseSender().send("Application is stopped.");
+                exchange.getResponseSender().send("Application is stopped.\n");
                 quit();
             })
             .setFallbackHandler(HttpHandlerHelper::notFoundHandler)

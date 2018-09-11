@@ -2,23 +2,19 @@ package com.odnolap.tst1.repository;
 
 import com.odnolap.tst1.helper.db.DbHelper;
 import com.odnolap.tst1.model.NewTransactionRequest;
-import com.odnolap.tst1.model.db.Currency;
-import com.odnolap.tst1.model.db.ExchangeRate;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
 import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 
 import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Singleton
 @Slf4j
 public class MoneyTransferRepositoryInMemoryDb implements MoneyTransferRepository {
 
-    private Session session = DbHelper.getSession(); // It's used 1 connection for test purposes.
+    private Session session = DbHelper.getSession(); // It's used only 1 session for test purposes.
 
     @Override
     public MoneyTransferTransaction getTransaction(Long transactionId) {
