@@ -3,7 +3,7 @@ package com.odnolap.tst1.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.odnolap.tst1.config.AppInjector;
-import com.odnolap.tst1.helper.db.dbHelper;
+import com.odnolap.tst1.helper.db.DbHelper;
 import com.odnolap.tst1.helper.undertow.HttpHandlerHelper;
 import com.odnolap.tst1.helper.undertow.RequestHelper;
 import com.odnolap.tst1.model.undertow.SimpleServer;
@@ -11,13 +11,14 @@ import com.odnolap.tst1.model.undertow.Slf4jAccessLogReceiver;
 import com.odnolap.tst1.service.MoneyTransferService;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
 import io.undertow.server.RoutingHandler;
 import io.undertow.server.handlers.accesslog.AccessLogHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.MimeMappings;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
 
 @Slf4j
 public class MoneyTransferRestServer {
@@ -72,15 +73,11 @@ public class MoneyTransferRestServer {
         ;
     }
 
-    static void quit() {
+    static void quit() throws SQLException {
         log.info("Stopping application.");
-        dbHelper.shutdownDb();
+        DbHelper.shutdownDb();
         server.stop();
         server = null;
         log.info("Application is stopped.");
-        // System.exit(0); // Fast implementation of shutdown.
-                        // Stopping the server using server.stop() method as described here:
-                        // http://undertow.io/undertow-docs/undertow-docs-2.0.0/index.html#the-builder-api
-                        // doesn't work.
     }
 }

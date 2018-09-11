@@ -3,7 +3,7 @@ package com.odnolap.tst1.unitcommon;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.odnolap.tst1.helper.db.dbHelper;
+import com.odnolap.tst1.helper.db.DbHelper;
 import com.odnolap.tst1.repository.MoneyTransferRepository;
 import com.odnolap.tst1.service.MoneyTransferService;
 import com.odnolap.tst1.service.MoneyTransferServiceImpl;
@@ -16,7 +16,7 @@ public abstract class BaseUnitTest {
 
     @BeforeClass
     public static void initEnvironment() {
-        dbHelper.initDb();
+//        DbHelper.initDb();
         injector = Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
@@ -28,6 +28,6 @@ public abstract class BaseUnitTest {
 
     @AfterClass
     public static void shutdownEnvironment() {
-        dbHelper.shutdownDb();
+//        DbHelper.shutdownDb();
     }
 }

@@ -8,8 +8,10 @@ public class Customer {
     private String firstName;
     private String lastName;
     private String patronymicName;
+    private String email;
     private Country country;
     private String idCardNumber;
     private String address;
+    private Long registeredTimestamp;
     private boolean isActive;
 }
