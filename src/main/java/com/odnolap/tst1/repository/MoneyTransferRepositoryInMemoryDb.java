@@ -1,9 +1,7 @@
 package com.odnolap.tst1.repository;
 
-import com.odnolap.tst1.helper.db.DbHelper;
-import com.odnolap.tst1.model.NewTransactionRequest;
+import com.odnolap.tst1.helper.db.InMemoryDbHelper;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
-import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 
@@ -14,7 +12,7 @@ import java.util.List;
 @Slf4j
 public class MoneyTransferRepositoryInMemoryDb implements MoneyTransferRepository {
 
-    private Session session = DbHelper.getSession(); // It's used only 1 session for test purposes.
+    private Session session = InMemoryDbHelper.getSession(); // It's used only 1 session for test purposes.
 
     @Override
     public MoneyTransferTransaction getTransaction(Long transactionId) {
@@ -23,43 +21,39 @@ public class MoneyTransferRepositoryInMemoryDb implements MoneyTransferRepositor
 
     @Override
     public List<MoneyTransferTransaction> getAccountTransactions(Long accountId, int startFrom, int offset) {
-        List<MoneyTransferTransaction> result = session.createNamedQuery(MoneyTransferTransaction.BY_ACCT_ID, MoneyTransferTransaction.class)
+        log.trace("Getting transactions for accountId {}, startFrom={}, offset={}", accountId, startFrom, offset);
+        return session.createNamedQuery(MoneyTransferTransaction.BY_ACCT_ID, MoneyTransferTransaction.class)
             .setParameter("accountId", accountId)
             .setFirstResult(startFrom)
             .setMaxResults(offset)
             .getResultList();
-
-        return result;
     }
 
     @Override
     public List<MoneyTransferTransaction> getCustomerTransactions(Long customerId, int startFrom, int offset) {
-        List<MoneyTransferTransaction> result = session.createNamedQuery(MoneyTransferTransaction.BY_CUST_ID, MoneyTransferTransaction.class)
+        log.trace("Getting transactions for customerId {}, startFrom={}, offset={}", customerId, startFrom, offset);
+        return session.createNamedQuery(MoneyTransferTransaction.BY_CUST_ID, MoneyTransferTransaction.class)
             .setParameter("customerId", customerId)
             .setFirstResult(startFrom)
             .setMaxResults(offset)
             .getResultList();
-
-        return result;
     }
 
-    public MoneyTransferTransaction createNewTransaction(NewTransactionRequest request) {
-        log.info("Creating a new transaction.\n {}", request); // TODO
-        MoneyTransferTransaction result = new MoneyTransferTransaction();
-        result.setStatus(MoneyTransferTransactionStatus.SUCCESSFUL);
-        return result;
+    @Override
+    public List<MoneyTransferTransaction> getAllTransactions(int startFrom, int offset) {
+        log.trace("Getting all transactions startFrom={}, offset={}", startFrom, offset);
+        return session.createNamedQuery(MoneyTransferTransaction.ALL, MoneyTransferTransaction.class)
+            .setFirstResult(startFrom)
+            .setMaxResults(offset)
+            .getResultList();
     }
 
-    /*
-    session.beginTransaction();
-
-    ContactEntity contactEntity = new ContactEntity();
-
-        contactEntity.setBirthDate(new java.util.Date());
-        contactEntity.setFirstName("Nick");
-        contactEntity.setLastName("VN");
-
-        session.save(contactEntity);
-        session.getTransaction().commit();*/
+    public MoneyTransferTransaction saveTransaction(MoneyTransferTransaction transaction) {
+        log.trace("Saving a transaction.\n {}", transaction);
+        session.beginTransaction();
+        Long transactionId = (Long)session.save("transactions", transaction);
+        session.getTransaction().commit();
+        return getTransaction(transactionId);
+    }
 
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.odnolap.tst1.helper.PropertiesHelper;
-import com.odnolap.tst1.model.NewTransactionRequest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.MoneyTransferRequest;
 import com.odnolap.tst1.model.exceptions.RequestParsingException;
@@ -24,34 +23,21 @@ import java.util.TreeMap;
 public class RequestHelper {
 
     public static final ObjectMapper MAPPER;
-    private static int DEFAULT_OFFSET = 10;
+    private static int DEFAULT_OFFSET;
     static {
         MAPPER = new ObjectMapper();
 
-        // Don't throw an exception when json has extra fields you are
-        // not serializing on. This is useful when you want to use a pojo
-        // for deserialization and only care about a portion of the json
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        // Ignore null values when writing json.
         MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-        // Write times as a String instead of a Long so its human readable.
         MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         MAPPER.registerModule(new JavaTimeModule());
 
-        try {
-            DEFAULT_OFFSET = (Integer) PropertiesHelper.getProperty("default.offset");
-        } catch (NumberFormatException | ClassCastException ex) {
-            DEFAULT_OFFSET = 10;
-        }
-
+        DEFAULT_OFFSET = PropertiesHelper.getProperty("default.offset", 10);
     }
 
     private static final String ID = "id";
     private static final String ACCOUNT_ID_PARAM = "accountId";
     private static final String CUSTOMER_ID_PARAM = "customerId";
-
     private static final String PAGE_NUMBER = "page";
     private static final String OFFSET = "offset";
 
@@ -121,9 +107,8 @@ public class RequestHelper {
         }
     }
 
-    public static NewTransactionRequest createNewTransactionRequest(HttpServerExchange exchange) {
-        MoneyTransferRequest moneyTransferRequest = RequestHelper.getRequestBodyWithThrow(exchange, MoneyTransferRequest.class);
-        return new NewTransactionRequest(moneyTransferRequest);
+    public static MoneyTransferRequest createNewTransactionRequest(HttpServerExchange exchange) {
+        return getRequestBodyWithThrow(exchange, MoneyTransferRequest.class);
     }
 
     public static Deque<String> getParamValues(HttpServerExchange exchange, String paramName) {

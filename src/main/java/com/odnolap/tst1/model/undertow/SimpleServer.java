@@ -1,5 +1,6 @@
 package com.odnolap.tst1.model.undertow;
 
+import com.odnolap.tst1.helper.PropertiesHelper;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
@@ -7,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SimpleServer {
-    private static final int DEFAULT_PORT = 8080;
-    private static final String DEFAULT_HOST = "localhost";
+    private static final int PORT = PropertiesHelper.getProperty("port", 8080);
+    private static final String HOST = PropertiesHelper.getProperty("host", "localhost");
 
     private final Undertow.Builder undertowBuilder;
 
@@ -37,7 +38,7 @@ public class SimpleServer {
              */
             .setServerOption(UndertowOptions.ALLOW_EQUALS_IN_COOKIE_VALUE, true)
             .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 2000)
-            .addHttpListener(DEFAULT_PORT, DEFAULT_HOST, handler)
+            .addHttpListener(PORT, HOST, handler)
             ;
         return new SimpleServer(undertow);
     }

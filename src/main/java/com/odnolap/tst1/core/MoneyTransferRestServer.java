@@ -3,7 +3,7 @@ package com.odnolap.tst1.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.odnolap.tst1.config.AppInjector;
-import com.odnolap.tst1.helper.db.DbHelper;
+import com.odnolap.tst1.helper.db.InMemoryDbHelper;
 import com.odnolap.tst1.helper.undertow.HttpHandlerHelper;
 import com.odnolap.tst1.helper.undertow.RequestHelper;
 import com.odnolap.tst1.model.undertow.SimpleServer;
@@ -40,9 +40,10 @@ public class MoneyTransferRestServer {
 
     private static HttpHandler initRoot(MoneyTransferService service) {
         String rootDescription = "It's just a test server!\n"
-            + "Try to get localhost:8080/v1/transactions?accountId=11&page=0&offset=10 or "
-            + "localhost:8080/v1/transactions?cusTOmeRId=1&page=1&offset=2 "
-            + "or localhost:8080/v1/transactions/1003 for example.\n"
+            + "Try to get localhost:8080/v1/transactions?accountId=11&page=0&offset=10\n"
+            + "or localhost:8080/v1/transactions?cusTOmeRId=1&page=1&offset=2\n"
+            + "or localhost:8080/v1/transactions/1003\n"
+            + "or localhost:8080/v1/transactions?page=0&offset=20 for example.\n"
             + "Available endpoints:\n"
             + "- /v1/transactions (GET, POST)\n"
             + "- /v1/transactions/{id} (GET)\n";
@@ -78,7 +79,7 @@ public class MoneyTransferRestServer {
 
     static void quit() throws SQLException, IOException {
         log.info("Stopping application.");
-        DbHelper.shutdownDb();
+        InMemoryDbHelper.shutdownDb();
         server.stop();
         server = null;
         log.info("Application is stopped.");

@@ -36,9 +36,8 @@ public class Account {
     @NotNull
     private Float balance;
 
-    @Column(name = "is_active", nullable = false)
-    @NotNull
-    private boolean isActive = true;
+    @Column
+    private Float blocked = 0f;
 
     // It's enough to compare 2 records by their id, because it's the primary key
     @Override

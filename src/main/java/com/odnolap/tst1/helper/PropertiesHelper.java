@@ -13,7 +13,7 @@ public class PropertiesHelper {
     private static Map<Object, Object> appProperties;
     private static final String propertiesFileName = "application.properties";
 
-    public static Object getProperty(Object property) {
+    public static String getProperty(String propertyName) {
         if (appProperties == null) {
             appProperties = new HashMap<>();
             try(InputStream propertiesIs = PropertiesHelper.class.getClassLoader().getResourceAsStream(propertiesFileName)) {
@@ -25,6 +25,24 @@ public class PropertiesHelper {
                 log.info("Error during reading properties from {}: {} ", propertiesFileName, ex.getMessage());
             }
         }
-        return appProperties.get(property);
+        return (String)appProperties.get(propertyName);
+    }
+
+    public static String getProperty(String propertyName, String defaultValue) {
+        try {
+            String property = getProperty(propertyName);
+            return property == null ? defaultValue : property;
+        } catch (Exception ex) {
+            return defaultValue;
+        }
+    }
+
+    public static int getProperty(String propertyName, int defaultValue) {
+        try {
+            String propertyStr = getProperty(propertyName);
+            return propertyStr == null ? defaultValue : Integer.parseInt(propertyStr);
+        } catch (Exception ex) {
+            return defaultValue;
+        }
     }
 }

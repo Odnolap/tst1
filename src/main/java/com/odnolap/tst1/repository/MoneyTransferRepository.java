@@ -1,9 +1,7 @@
 package com.odnolap.tst1.repository;
 
-import com.odnolap.tst1.model.NewTransactionRequest;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
 
-import java.io.Closeable;
 import java.util.List;
 
 public interface MoneyTransferRepository {
@@ -14,6 +12,8 @@ public interface MoneyTransferRepository {
 
     List<MoneyTransferTransaction> getCustomerTransactions(Long customerId, int startFrom, int offset);
 
-    MoneyTransferTransaction createNewTransaction(NewTransactionRequest request);
+    List<MoneyTransferTransaction> getAllTransactions(int startFrom, int offset);
+
+    MoneyTransferTransaction saveTransaction(MoneyTransferTransaction transaction);
 
 }

@@ -1,8 +1,6 @@
 package com.odnolap.tst1.repository;
 
 import com.odnolap.tst1.unitcommon.BaseUnitTest;
-import com.odnolap.tst1.model.MoneyTransferRequest;
-import com.odnolap.tst1.model.NewTransactionRequest;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,11 +34,13 @@ public class MoneyTransferRepositoryTest extends BaseUnitTest {
 //        System.out.println("transactionId: " + transactions.iterator().next().getId());
     }
 
+/*
     @Test
     public void createMoneyTransferTransaction() {
         MoneyTransferRequest request = new MoneyTransferRequest();
-        MoneyTransferTransaction transacion = repository.createNewTransaction(new NewTransactionRequest(request));
+        MoneyTransferTransaction transacion = repository.saveTransaction(request);
 //        System.out.println("status: " + transacion.getStatus());
     }
+*/
 
 }

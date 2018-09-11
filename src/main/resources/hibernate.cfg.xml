@@ -7,18 +7,13 @@
         <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
         <property name="connection.url">jdbc:h2:mem:tst1db;INIT=RUNSCRIPT FROM 'classpath:db/init.sql'</property>
         <property name="connection.driver_class">org.h2.Driver</property>
-
-        <!-- NOTE that after automapping with IDEA property username and password will delete -->
-        <!--and will be:  Initial SessionFactory failedorg.hibernate.service.spi.ServiceException: Unable to create requested service-->
         <property name="connection.username">sa</property>
         <property name="connection.password">sa</property>
         <property name="connection.autocommit">false</property>
-        <!-- NOTE that after automapping with IDEA property username and password wi ll delete -->
+        <property name="show_sql">false</property>
         <mapping class="com.odnolap.tst1.model.db.Customer"/>
         <mapping class="com.odnolap.tst1.model.db.Account"/>
         <mapping class="com.odnolap.tst1.model.db.ExchangeRate"/>
         <mapping class="com.odnolap.tst1.model.db.MoneyTransferTransaction"/>
-        <!-- DB schema will be updated if needed -->
-        <!-- <property name="hbm2ddl.auto">update</property> -->
     </session-factory>
 </hibernate-configuration>

@@ -1,10 +1,10 @@
 package com.odnolap.tst1.service;
 
+import com.odnolap.tst1.model.dto.MoneyTransferTransactionDto;
 import com.odnolap.tst1.unitcommon.BaseUnitTest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.GetTransactionsResponse;
 import com.odnolap.tst1.model.MoneyTransferRequest;
-import com.odnolap.tst1.model.NewTransactionRequest;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
 import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import org.junit.BeforeClass;
@@ -52,7 +52,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     @Test
     public void createMoneyTransferTransaction() {
         MoneyTransferRequest request = new MoneyTransferRequest();
-        MoneyTransferTransaction response = service.createMoneyTransferTransaction(new NewTransactionRequest(request));
+        MoneyTransferTransactionDto response = service.createMoneyTransferTransaction(request);
         assertEquals(MoneyTransferTransactionStatus.SUCCESSFUL, response.getStatus());
     }
 }

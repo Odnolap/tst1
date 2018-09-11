@@ -65,10 +65,6 @@ public class Customer {
     @CreationTimestamp
     private Date registered = new Date();
 
-    @Column(name = "is_active", nullable = false)
-    @NotNull
-    private boolean isActive = true;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     @OrderBy("id ASC")
     private List<Account> accounts;

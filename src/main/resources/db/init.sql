@@ -13,8 +13,7 @@ CREATE TABLE customers
   country VARCHAR(2) NOT NULL,
   id_card_number VARCHAR(255) NOT NULL UNIQUE,
   address VARCHAR(255) NOT NULL,
-  registered TIMESTAMP DEFAULT now(),
-  is_active BOOLEAN DEFAULT true
+  registered TIMESTAMP DEFAULT now()
 )
 AS SELECT * FROM CSVREAD('classpath:db/populate_customers.csv');
 
@@ -24,7 +23,7 @@ CREATE TABLE accounts
   customer_id BIGINT NOT NULL,
   currency VARCHAR(3) NOT NULL,
   balance FLOAT,
-  is_active BOOLEAN DEFAULT true,
+  blocked FLOAT,
   FOREIGN KEY ( customer_id ) REFERENCES customers ( id )
 )
 AS SELECT * FROM CSVREAD('classpath:db/populate_accounts.csv');

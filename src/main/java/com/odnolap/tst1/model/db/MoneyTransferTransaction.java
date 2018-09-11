@@ -34,6 +34,13 @@ import java.util.Date;
             + " JOIN FETCH a2.customer c2"
             + " WHERE c1.id = :customerId OR c2.id = :customerId"
             + " ORDER BY t.creationTimestamp DESC"),
+    @NamedQuery(name = MoneyTransferTransaction.ALL,
+        query = "SELECT t FROM MoneyTransferTransaction t"
+            + " JOIN FETCH t.accountFrom a1"
+            + " JOIN FETCH a1.customer c1"
+            + " JOIN FETCH t.accountTo a2"
+            + " JOIN FETCH a2.customer c2"
+            + " ORDER BY t.creationTimestamp DESC")
 })
 
 @Data
@@ -42,6 +49,7 @@ import java.util.Date;
 public class MoneyTransferTransaction {
     public static final String BY_ACCT_ID = "UsMoneyTransferTransactioner.getByAcctId";
     public static final String BY_CUST_ID = "UsMoneyTransferTransactioner.getByCustId";
+    public static final String ALL = "UsMoneyTransferTransactioner.getAll";
 
     @Id
     @GeneratedValue
