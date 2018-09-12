@@ -1,8 +1,10 @@
 package com.odnolap.tst1.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class GetAccountsRequest extends PageableRequest {
     private Long accountId;
 }

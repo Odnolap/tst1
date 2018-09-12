@@ -9,11 +9,26 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+
+@NamedQueries({
+    @NamedQuery(name = ExchangeRate.ALL,
+        query = "SELECT e FROM ExchangeRate e ORDER BY e.validFrom DESC, e.currencyFrom DESC, e.currencyTo DESC "),
+    @NamedQuery(name = ExchangeRate.BY_CURRENCIES_AND_DATE,
+        query = "SELECT e FROM ExchangeRate e"
+            + " WHERE e.currencyFrom = :currencyFrom"
+            + " AND e.currencyTo = :currencyTo"
+            + " AND e.validFrom <= :dt"
+            + " AND (e.validTo IS NULL OR e.validTo > :dt)"
+            + " ORDER BY e.validFrom DESC")
+})
 
 @Data
 @AllArgsConstructor
@@ -21,8 +36,11 @@ import java.util.Date;
 @Entity
 @Table(name = "exchange_rates")
 public class ExchangeRate {
+    public static final String ALL = "ExchangeRate.getAll";
+    public static final String BY_CURRENCIES_AND_DATE = "ExchangeRate.byCurrenciesAndDate";
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(value = EnumType.STRING)

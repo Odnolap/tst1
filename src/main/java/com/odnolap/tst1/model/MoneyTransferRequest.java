@@ -1,11 +1,11 @@
 package com.odnolap.tst1.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odnolap.tst1.model.db.Currency;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-@Data
+@Getter
+@Setter
 public class MoneyTransferRequest {
     private Long accountFromId;
     private Long customerToId;

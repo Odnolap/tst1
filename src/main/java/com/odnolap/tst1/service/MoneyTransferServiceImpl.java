@@ -10,6 +10,7 @@ import com.odnolap.tst1.model.db.ExchangeRate;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
 import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import com.odnolap.tst1.model.dto.MoneyTransferTransactionDto;
+import com.odnolap.tst1.model.exceptions.MoneyTransferProcessingException;
 import com.odnolap.tst1.repository.AccountRepository;
 import com.odnolap.tst1.repository.CustomerRepository;
 import com.odnolap.tst1.repository.ExchangeRateRepository;
@@ -147,7 +148,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
             }
         } catch (Exception ex) {
             errMsg = "Error during creating transaction: " + ex.getMessage();
-            log.error(errMsg + ":\n" + request, ex);
+            throw new MoneyTransferProcessingException(errMsg, ex);
         }
 
         MoneyTransferTransaction savedTransaction = null;

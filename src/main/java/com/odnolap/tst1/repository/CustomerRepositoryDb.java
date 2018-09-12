@@ -19,19 +19,30 @@ public class CustomerRepositoryDb implements CustomerRepository {
 
     @Override
     public Customer getCustomer(Long customerId) {
+        return getCustomer(customerId, null);
+    }
+
+    public Customer getCustomer(Long customerId, Session session) {
         log.trace("Getting customer by id: {}", customerId);
-        Session session = sessionFactory.openSession();
+        boolean isSessionNew = session == null;
+        if (isSessionNew) {
+            session = sessionFactory.openSession();
+        }
         Customer customer = session.byId(Customer.class).load(customerId);
-        session.close();
+        if (isSessionNew) {
+            session.close();
+        }
         return customer;
     }
 
     @Override
     public Customer getCustomerWithAccounts(Long customerId) {
-        Customer customer = getCustomer(customerId);
+        Session session = sessionFactory.openSession();
+        Customer customer = getCustomer(customerId, session);
         if (customer != null) {
             Hibernate.initialize(customer.getAccounts()); // Load data to lazy field
         }
+        session.close();
         return customer;
     }
 

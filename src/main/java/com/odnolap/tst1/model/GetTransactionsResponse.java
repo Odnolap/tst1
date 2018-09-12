@@ -1,11 +1,13 @@
 package com.odnolap.tst1.model;
 
 import com.odnolap.tst1.model.dto.MoneyTransferTransactionDto;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class GetTransactionsResponse {
     private List<MoneyTransferTransactionDto> transactions;
 }

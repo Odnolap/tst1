@@ -76,7 +76,7 @@ public class MoneyTransferRepositoryDb implements MoneyTransferRepository {
     }
 
     public MoneyTransferTransaction saveTransaction(MoneyTransferTransaction transaction) {
-        log.trace("Saving a transaction.\n {}", transaction);
+        log.trace("Saving a transaction in DB.\n {}", transaction);
         Session session = sessionFactory.openSession();
         Transaction dbTransaction = null;
         Long transactionId;
@@ -89,7 +89,7 @@ public class MoneyTransferRepositoryDb implements MoneyTransferRepository {
                 dbTransaction.rollback();
             }
             session.close();
-            throw new DbPersistenceException("Error during saving a new transaction to database.", ex);
+            throw new DbPersistenceException("Error during saving a new transaction to DB.", ex);
         }
         MoneyTransferTransaction newTransaction = getTransaction(transactionId, session);
         session.close();

@@ -11,6 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -37,7 +38,7 @@ public class Customer {
     public static final String ALL = "Customer.getAll";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "first_name", nullable = false)
@@ -110,5 +111,21 @@ public class Customer {
             sb.append(' ').append(patronymicName.trim().charAt(0)).append('.');
         }
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+            "id=" + id +
+            ", firstName='" + firstName + '\'' +
+            ", lastName='" + lastName + '\'' +
+            (patronymicName == null ? "" : ", patronymicName='" + patronymicName + '\'') +
+            ", email='" + email + '\'' +
+            ", country=" + country +
+            ", idCardNumber='" + idCardNumber + '\'' +
+            ", address='" + address + '\'' +
+            ", registered=" + registered +
+            ", accounts=" + accounts +
+            '}';
     }
 }

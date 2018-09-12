@@ -7,6 +7,9 @@ import com.odnolap.tst1.helper.undertow.HttpHandlerHelper;
 import com.odnolap.tst1.helper.undertow.RequestHelper;
 import com.odnolap.tst1.model.undertow.SimpleServer;
 import com.odnolap.tst1.model.undertow.Slf4jAccessLogReceiver;
+import com.odnolap.tst1.service.AccountService;
+import com.odnolap.tst1.service.CustomerService;
+import com.odnolap.tst1.service.ExchangeRateService;
 import com.odnolap.tst1.service.MoneyTransferService;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
@@ -30,15 +33,19 @@ public class MoneyTransferRestServer {
     public static synchronized void startServer() {
         if (!isServerRun) {
             injector = Guice.createInjector(new AppInjector());
-            MoneyTransferService service = injector.getInstance(MoneyTransferService.class);
-            HttpHandler root = initRoot(service);
+            MoneyTransferService moneyTransferService = injector.getInstance(MoneyTransferService.class);
+            CustomerService customerService = injector.getInstance(CustomerService.class);
+            AccountService accountService = injector.getInstance(AccountService.class);
+            ExchangeRateService exchangeRateService = injector.getInstance(ExchangeRateService.class);
+            HttpHandler root = initRoot(moneyTransferService, customerService, accountService, exchangeRateService);
             server = SimpleServer.simpleServer(root).start();
             isServerRun = true;
             log.info("Money transfer server started.");
         }
     }
 
-    private static HttpHandler initRoot(MoneyTransferService service) {
+    private static HttpHandler initRoot(MoneyTransferService moneyTransferService, CustomerService customerService,
+                                        AccountService accountService, ExchangeRateService exchangeRateService) {
         String rootDescription = "It's just a test server!\n"
             + "Try to get localhost:8080/v1/transactions?accountId=11&page=0&offset=10\n"
             + "or localhost:8080/v1/transactions?cusTOmeRId=1&page=1&offset=2\n"
@@ -46,22 +53,54 @@ public class MoneyTransferRestServer {
             + "or localhost:8080/v1/transactions?page=0&offset=20 for example.\n"
             + "Available endpoints:\n"
             + "- /v1/transactions (GET, POST)\n"
-            + "- /v1/transactions/{id} (GET)\n";
+            + "- /v1/transactions/{id} (GET)\n"
+            + "- /v1/customers (GET)\n"
+            + "- /v1/customers/{id} (GET)\n"
+            + "- /v1/accounts (GET)\n"
+            + "- /v1/accounts/{id} (GET)\n"
+            + "- /v1/rates (GET)\n"
+            + "- /v1/rates/{id} (GET)\n"
+            ;
 
         HttpHandler routes = new RoutingHandler()
             .get("/", HttpHandlerHelper.simpleTextHandler(rootDescription))
+
+            // Transactions: GET, CREATE
             .get("/v1/transactions", HttpHandlerHelper.jsonHttpHandler(
-                exchange -> service.getTransactions(RequestHelper.createGetTransactionsRequest(exchange)))
+                exchange -> moneyTransferService.getTransactions(RequestHelper.createGetTransactionsRequest(exchange)))
             )
             .get("/v1/transactions/{id}", HttpHandlerHelper.jsonHttpHandler(
-                exchange -> service.getTransactions(RequestHelper.createGetTransactionsRequest(exchange)))
+                exchange -> moneyTransferService.getTransactions(RequestHelper.createGetTransactionsRequest(exchange)))
             )
             .post("/v1/transactions", HttpHandlerHelper.jsonBlockingHttpHandler(
-                exchange -> service.createMoneyTransferTransaction(RequestHelper.createNewTransactionRequest(exchange)),
+                exchange -> moneyTransferService.createMoneyTransferTransaction(RequestHelper.createNewTransactionRequest(exchange)),
                 201)
             )
-            // TODO: other endpoints
-            // TODO: include them in root descr and README
+
+            // Customers: GET
+            .get("/v1/customers", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> customerService.getCustomers(RequestHelper.createGetCustomersRequest(exchange)))
+            )
+            .get("/v1/customers/{id}", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> customerService.getCustomers(RequestHelper.createGetCustomersRequest(exchange)))
+            )
+
+            // Accounts: GET
+            .get("/v1/accounts", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> accountService.getAccounts(RequestHelper.createGetAccountsRequest(exchange)))
+            )
+            .get("/v1/accounts/{id}", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> accountService.getAccounts(RequestHelper.createGetAccountsRequest(exchange)))
+            )
+
+            // Exchange rates: GET
+            .get("/v1/rates", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> exchangeRateService.getExchangeRates(RequestHelper.createGetExchangeRatesRequest(exchange)))
+            )
+            .get("/v1/rates/{id}", HttpHandlerHelper.jsonHttpHandler(
+                exchange -> exchangeRateService.getExchangeRates(RequestHelper.createGetExchangeRatesRequest(exchange)))
+            )
+
             .get("/v1/quit", exchange -> {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE,
                     MimeMappings.DEFAULT_MIME_MAPPINGS.get("txt"));

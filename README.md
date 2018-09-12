@@ -10,10 +10,14 @@ or `localhost:8080/v1/transactions?page=0&offset=20` for example.
 Available endpoints:  
 - /v1/transactions (GET, POST)  
 - /v1/transactions/{id} (GET)  
+- /v1/customers (GET)
+- /v1/customers/{id} (GET)
+- /v1/accounts (GET)
+- /v1/accounts/{id} (GET)
+- /v1/rates (GET)
+- /v1/rates/{id} (GET)
 
-For GET request you may specify either 'accountId' or 'customerId' query parameter or 'id' in path. 
-
-Body content example for POST request:
+Body content example for POST /v1/transactions request:
 ```json
 {
   "accountFromId": 11,
