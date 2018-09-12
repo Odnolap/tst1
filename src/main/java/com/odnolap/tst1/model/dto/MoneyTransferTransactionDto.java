@@ -21,9 +21,9 @@ public class MoneyTransferTransactionDto {
     private Currency currencyTo;
     private Float amountTo;
     private Float rate;
-    private Date creationTimestamp = new Date();
+    private Date creationTimestamp;
     private Date finalizationTimestamp;
-    private MoneyTransferTransactionStatus status = MoneyTransferTransactionStatus.CREATED;
+    private MoneyTransferTransactionStatus status;
     private String description;
 
     public MoneyTransferTransactionDto(MoneyTransferTransaction transaction) {

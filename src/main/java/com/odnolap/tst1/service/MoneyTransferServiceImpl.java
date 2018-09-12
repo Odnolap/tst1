@@ -8,7 +8,11 @@ import com.odnolap.tst1.model.db.Currency;
 import com.odnolap.tst1.model.db.Customer;
 import com.odnolap.tst1.model.db.ExchangeRate;
 import com.odnolap.tst1.model.db.MoneyTransferTransaction;
+import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import com.odnolap.tst1.model.dto.MoneyTransferTransactionDto;
+import com.odnolap.tst1.repository.AccountRepository;
+import com.odnolap.tst1.repository.CustomerRepository;
+import com.odnolap.tst1.repository.ExchangeRateRepository;
 import com.odnolap.tst1.repository.MoneyTransferRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,36 +24,45 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.odnolap.tst1.model.db.MoneyTransferTransactionStatus.REJECTED;
+import static com.odnolap.tst1.model.db.MoneyTransferTransactionStatus.SUCCESSFUL;
+
 @Singleton
 @Slf4j
 public class MoneyTransferServiceImpl implements MoneyTransferService {
 
     @Inject
-    private MoneyTransferRepository repository;
+    private MoneyTransferRepository moneyTransferRepository;
+    @Inject
+    private CustomerRepository customerRepository;
+    @Inject
+    private AccountRepository accountRepository;
+    @Inject
+    private ExchangeRateRepository exchangeRateRepository;
 
     public GetTransactionsResponse getTransactions(GetTransactionsRequest request) {
         GetTransactionsResponse result = new GetTransactionsResponse();
         List<MoneyTransferTransaction> transactions;
         if (request.getTransactionId() != null) {
-            transactions = Collections.singletonList(repository.getTransaction(request.getTransactionId()));
+            transactions = Collections.singletonList(moneyTransferRepository.getTransaction(request.getTransactionId()));
         } else if (request.getAccountId() != null) {
             Long accountId = request.getAccountId();
-            Account account = getAccount(accountId);
+            Account account = accountRepository.getAccount(accountId);
             if (account == null) {
                 throw new IllegalArgumentException("Account with id " + accountId + " doesn't exists. Transaction not created");
             } else {
-                transactions = repository.getAccountTransactions(accountId, request.getStartFrom(), request.getOffset());
+                transactions = moneyTransferRepository.getAccountTransactions(accountId, request.getStartFrom(), request.getOffset());
             }
         } else if (request.getCustomerId() != null) {
             Long customerId = request.getCustomerId();
-            Customer customer = getCustomer(customerId);
+            Customer customer = customerRepository.getCustomer(customerId);
             if (customer == null) {
                 throw new IllegalArgumentException("Customer with id " + customerId + " doesn't exists. Transaction not created");
             } else {
-                transactions = repository.getCustomerTransactions(customerId, request.getStartFrom(), request.getOffset());
+                transactions = moneyTransferRepository.getCustomerTransactions(customerId, request.getStartFrom(), request.getOffset());
             }
         } else {
-            transactions = repository.getAllTransactions(request.getStartFrom(), request.getOffset());
+            transactions = moneyTransferRepository.getAllTransactions(request.getStartFrom(), request.getOffset());
         }
 
         List<MoneyTransferTransactionDto> resultTransactions = transactions.stream()
@@ -72,13 +85,13 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
 
         try {
             Long accountFromId = request.getAccountFromId();
-            Account accountFrom = getAccount(accountFromId);
+            Account accountFrom = accountRepository.getAccount(accountFromId);
             if (accountFrom == null) {
                 errMsg = "Account with id " + accountFromId + " doesn't exists. Transaction not created";
                 log.error(errMsg + ":\n{}", request);
             } else {
                 Long customerToId = request.getCustomerToId();
-                Customer customerTo = getCustomerWithAccounts(customerToId);
+                Customer customerTo = customerRepository.getCustomerWithAccounts(customerToId);
                 if (customerTo == null) {
                     errMsg = "Customer with id " + customerToId + " doesn't exists. Transaction not created";
                     log.error(errMsg + ":\n{}", request);
@@ -93,25 +106,41 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
                             + customerToId + " doesn't exists. Transaction not created";
                         log.error(errMsg + ":\n{}", request);
                     } else {
-                        // Only here we start changing info in DB (block amount,
-                        Float amountFrom = request.getAmountFrom();
-                        boolean isAmountEnough = blockAmount(accountFrom, amountFrom);
-                        try {
-                            if (!isAmountEnough) {
-                                newTransaction = returnBlockedAmount(accountFromId, amountFrom, "");
-                            } else {
-                                Currency currencyFrom = accountFrom.getCurrency();
-                                ExchangeRate exchangeRate = getApropriateRate(transactionRegistered, currencyFrom, currencyTo);
-                                if (exchangeRate == null) {
-                                    newTransaction = returnBlockedAmount(accountFromId, amountFrom, "");
+                        Currency currencyFrom = accountFrom.getCurrency();
+                        ExchangeRate exchangeRate = exchangeRateRepository.getAppropriateRate(transactionRegistered, currencyFrom, currencyTo);
+                        if (exchangeRate == null) {
+                            errMsg = "There is no appropriate exchange rate for " + currencyFrom + " -> " + currencyTo +
+                                " that is valid for " + transactionRegistered + ". Transaction not created";
+                            log.error(errMsg + ":\n{}", request);
+                        } else {
+                            float amountFrom = request.getAmountFrom();
+                            float amountTo = amountFrom * exchangeRate.getRate();
+                            String description;
+                            MoneyTransferTransactionStatus status;
+                            try {
+                                boolean transactionSuccessful =
+                                    accountRepository.moveMoneyBetweenAccounts(accountFromId, amountFrom, accountTo.getId(), amountTo);
+                                if (transactionSuccessful) {
+                                    description = accountFrom.getCustomer().getId().equals(customerToId)
+                                        ? "transfer " + currencyFrom + " -> " + currencyTo + " between customer's accounts"
+                                        : "transfer " + currencyFrom + " -> " + currencyTo + " to other client ("
+                                        + customerTo.getShortName() + ")";
+                                    status = SUCCESSFUL;
                                 } else {
-                                    newTransaction = moveBlockedAmount(accountFromId, amountFrom,
-                                        accountTo, exchangeRate, transactionRegistered);
+                                    description = accountFrom.getBalance() < amountFrom
+                                        ? "Insufficient funds."
+                                        : "Error during moving money between accounts";
+                                    status = REJECTED;
                                 }
+                            } catch (Exception ex) {
+                                description = "Exception during creating transaction";
+                                status = REJECTED;
+                                log.error(description + ":\n" + request, ex);
                             }
-                        } catch (Exception ex) {
-                            log.error("Error during creating transaction:\n" + request, ex);
-                            newTransaction = returnBlockedAmount(accountFromId, amountFrom);
+                            newTransaction =
+                                new MoneyTransferTransaction(null, accountFrom, accountTo, currencyFrom, amountFrom,
+                                    currencyTo, amountTo, exchangeRate, transactionRegistered, new Date(), status,
+                                    description);
                         }
                     }
                 }
@@ -124,7 +153,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
         MoneyTransferTransaction savedTransaction = null;
         if (newTransaction != null) {
             newTransaction.setFinalizationTimestamp(new Date());
-            savedTransaction = repository.saveTransaction(newTransaction);
+            savedTransaction = moneyTransferRepository.saveTransaction(newTransaction);
         } else {
             MoneyTransferTransactionDto notSavedErrorResult = new MoneyTransferTransactionDto();
             notSavedErrorResult.setDescription(errMsg);

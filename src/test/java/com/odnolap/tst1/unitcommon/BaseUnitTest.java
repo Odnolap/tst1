@@ -2,8 +2,8 @@ package com.odnolap.tst1.unitcommon;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.odnolap.tst1.config.TestAppInjector;
-import com.odnolap.tst1.helper.db.InMemoryDbHelper;
+import com.odnolap.tst1.config.AppInjector;
+import org.hibernate.SessionFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -13,12 +13,12 @@ public abstract class BaseUnitTest {
 
     @BeforeClass
     public static void initEnvironment() {
-        InMemoryDbHelper.initDb();
-        injector = Guice.createInjector(new TestAppInjector());
+        injector = Guice.createInjector(new AppInjector());
     }
 
     @AfterClass
     public static void shutdownEnvironment() {
-        InMemoryDbHelper.shutdownDb();
+        SessionFactory sessionFactory = injector.getInstance(SessionFactory.class);
+        sessionFactory.close();
     }
 }

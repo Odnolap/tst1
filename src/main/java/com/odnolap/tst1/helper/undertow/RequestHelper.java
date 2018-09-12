@@ -6,8 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.odnolap.tst1.helper.PropertiesHelper;
+import com.odnolap.tst1.model.GetAccountsRequest;
+import com.odnolap.tst1.model.GetCustomersRequest;
+import com.odnolap.tst1.model.GetExchangeRatesRequest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.MoneyTransferRequest;
+import com.odnolap.tst1.model.PageableRequest;
 import com.odnolap.tst1.model.exceptions.RequestParsingException;
 import io.undertow.server.HttpServerExchange;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +45,12 @@ public class RequestHelper {
     private static final String PAGE_NUMBER = "page";
     private static final String OFFSET = "offset";
 
-    public static GetTransactionsRequest createGetTransactionRequest(HttpServerExchange exchange) {
+    public static GetTransactionsRequest createGetTransactionsRequest(HttpServerExchange exchange) {
         String idStr = getParamFirstValue(exchange, ID); // Located in path but stored in exchange.getQueryParameters
         String accountIdStr = getParamFirstValue(exchange, ACCOUNT_ID_PARAM);
         String customerIdStr = getParamFirstValue(exchange, CUSTOMER_ID_PARAM);
 
         GetTransactionsRequest result = new GetTransactionsRequest();
-        boolean parseSuccessful = false;
         // id
         if (StringUtils.isNotBlank(idStr)) {
             try {
@@ -56,7 +59,6 @@ public class RequestHelper {
                 throw new RequestParsingException("URL path \"" + ID
                     + "\" has invalid integer format or it's too long: \"" + idStr + "\"", ex);
             }
-            parseSuccessful = true;
         }
         // accountId
         if (StringUtils.isNotBlank(accountIdStr)) {
@@ -66,7 +68,6 @@ public class RequestHelper {
                 throw new RequestParsingException("Parameter \"" + ACCOUNT_ID_PARAM
                     + "\" has invalid integer format or it's too long: \"" + accountIdStr + "\"", ex);
             }
-            parseSuccessful = true;
         }
         // customerId
         if (StringUtils.isNotBlank(customerIdStr)) {
@@ -76,34 +77,88 @@ public class RequestHelper {
                 throw new RequestParsingException("Parameter \"" + CUSTOMER_ID_PARAM
                     + "\" has invalid integer format or it's too long: \"" + customerIdStr + "\"", ex);
             }
-            parseSuccessful = true;
         }
 
-        // There should be at least one of id, accountId or customerId
-        if (!parseSuccessful) {
-            throw new RequestParsingException("You've sent GET request. There is no " + ID + "in path and empty \""
-                + ACCOUNT_ID_PARAM + "\" and \"" + CUSTOMER_ID_PARAM + "\" params.");
-        } else {
-            // offset
-            String offsetStr = getParamFirstValue(exchange, OFFSET);
-            int offset;
+        putPaginationOptions(exchange, result);
+        return result;
+
+    }
+
+    public static GetCustomersRequest createGetCustomersRequest(HttpServerExchange exchange) {
+        String idStr = getParamFirstValue(exchange, ID); // Located in path but stored in exchange.getQueryParameters
+
+        GetCustomersRequest result = new GetCustomersRequest();
+        // id
+        if (StringUtils.isNotBlank(idStr)) {
             try {
-                offset = Integer.parseInt(offsetStr);
+                result.setCustomerId(Long.valueOf(idStr));
             } catch (NumberFormatException ex) {
-                offset = DEFAULT_OFFSET;
+                throw new RequestParsingException("URL path \"" + ID
+                    + "\" has invalid integer format or it's too long: \"" + idStr + "\"", ex);
             }
-            result.setOffset(offset);
+        }
 
-            // startFrom
-            String pageStr = getParamFirstValue(exchange, PAGE_NUMBER);
-            int page;
+        putPaginationOptions(exchange, result);
+        return result;
+
+    }
+
+    public static GetAccountsRequest createGetAccountsRequest(HttpServerExchange exchange) {
+        String idStr = getParamFirstValue(exchange, ID); // Located in path but stored in exchange.getQueryParameters
+
+        GetAccountsRequest result = new GetAccountsRequest();
+        // id
+        if (StringUtils.isNotBlank(idStr)) {
             try {
-                page = Integer.parseInt(pageStr);
-                result.setStartFrom(page * offset);
-            } catch (NumberFormatException ignored) {
+                result.setAccountId(Long.valueOf(idStr));
+            } catch (NumberFormatException ex) {
+                throw new RequestParsingException("URL path \"" + ID
+                    + "\" has invalid integer format or it's too long: \"" + idStr + "\"", ex);
             }
+        }
 
-            return result;
+        putPaginationOptions(exchange, result);
+        return result;
+
+    }
+
+    public static GetExchangeRatesRequest createGetExchangeRatesRequest(HttpServerExchange exchange) {
+        String idStr = getParamFirstValue(exchange, ID); // Located in path but stored in exchange.getQueryParameters
+
+        GetExchangeRatesRequest result = new GetExchangeRatesRequest();
+        // id
+        if (StringUtils.isNotBlank(idStr)) {
+            try {
+                result.setExchangeRateId(Long.valueOf(idStr));
+            } catch (NumberFormatException ex) {
+                throw new RequestParsingException("URL path \"" + ID
+                    + "\" has invalid integer format or it's too long: \"" + idStr + "\"", ex);
+            }
+        }
+
+        putPaginationOptions(exchange, result);
+        return result;
+
+    }
+
+    private static void putPaginationOptions(HttpServerExchange exchange, PageableRequest request) {
+        // offset
+        String offsetStr = getParamFirstValue(exchange, OFFSET);
+        int offset;
+        try {
+            offset = Integer.parseInt(offsetStr);
+        } catch (NumberFormatException ex) {
+            offset = DEFAULT_OFFSET;
+        }
+        request.setOffset(offset);
+
+        // startFrom
+        String pageStr = getParamFirstValue(exchange, PAGE_NUMBER);
+        int page;
+        try {
+            page = Integer.parseInt(pageStr);
+            request.setStartFrom(page * offset);
+        } catch (NumberFormatException ignored) {
         }
     }
 

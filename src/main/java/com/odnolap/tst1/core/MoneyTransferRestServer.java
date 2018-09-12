@@ -3,7 +3,6 @@ package com.odnolap.tst1.core;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.odnolap.tst1.config.AppInjector;
-import com.odnolap.tst1.helper.db.InMemoryDbHelper;
 import com.odnolap.tst1.helper.undertow.HttpHandlerHelper;
 import com.odnolap.tst1.helper.undertow.RequestHelper;
 import com.odnolap.tst1.model.undertow.SimpleServer;
@@ -16,6 +15,7 @@ import io.undertow.server.handlers.accesslog.AccessLogHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.MimeMappings;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.SessionFactory;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -51,15 +51,17 @@ public class MoneyTransferRestServer {
         HttpHandler routes = new RoutingHandler()
             .get("/", HttpHandlerHelper.simpleTextHandler(rootDescription))
             .get("/v1/transactions", HttpHandlerHelper.jsonHttpHandler(
-                exchange -> service.getTransactions(RequestHelper.createGetTransactionRequest(exchange)))
+                exchange -> service.getTransactions(RequestHelper.createGetTransactionsRequest(exchange)))
             )
             .get("/v1/transactions/{id}", HttpHandlerHelper.jsonHttpHandler(
-                exchange -> service.getTransactions(RequestHelper.createGetTransactionRequest(exchange)))
+                exchange -> service.getTransactions(RequestHelper.createGetTransactionsRequest(exchange)))
             )
             .post("/v1/transactions", HttpHandlerHelper.jsonBlockingHttpHandler(
                 exchange -> service.createMoneyTransferTransaction(RequestHelper.createNewTransactionRequest(exchange)),
                 201)
             )
+            // TODO: other endpoints
+            // TODO: include them in root descr and README
             .get("/v1/quit", exchange -> {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE,
                     MimeMappings.DEFAULT_MIME_MAPPINGS.get("txt"));
@@ -79,7 +81,8 @@ public class MoneyTransferRestServer {
 
     static void quit() throws SQLException, IOException {
         log.info("Stopping application.");
-        InMemoryDbHelper.shutdownDb();
+        SessionFactory sessionFactory = injector.getInstance(SessionFactory.class);
+        sessionFactory.close();
         server.stop();
         server = null;
         log.info("Application is stopped.");

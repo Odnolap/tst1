@@ -23,7 +23,6 @@ CREATE TABLE accounts
   customer_id BIGINT NOT NULL,
   currency VARCHAR(3) NOT NULL,
   balance FLOAT,
-  blocked FLOAT,
   FOREIGN KEY ( customer_id ) REFERENCES customers ( id )
 )
 AS SELECT * FROM CSVREAD('classpath:db/populate_accounts.csv');

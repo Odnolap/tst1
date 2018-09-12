@@ -1,6 +1,7 @@
 package com.odnolap.tst1.model.db;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
 
@@ -11,6 +12,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -20,10 +23,19 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
+@NamedQueries({
+    @NamedQuery(name = Customer.ALL,
+        query = "SELECT c FROM Customer c"
+            + " JOIN FETCH c.accounts"
+            + " ORDER BY c.registered DESC")
+})
+
 @Data
 @Entity
 @Table(name = "customers")
 public class Customer {
+    public static final String ALL = "Customer.getAll";
+
     @Id
     @GeneratedValue
     private Long id;
@@ -87,5 +99,16 @@ public class Customer {
     @Override
     public int hashCode() {
         return (id == null) ? 0 : id.intValue();
+    }
+
+    public String getShortName() {
+        StringBuilder sb = new StringBuilder(firstName);
+        if (StringUtils.isNotBlank(lastName)) {
+            sb.append(' ').append(lastName.trim().charAt(0)).append('.');
+        }
+        if (StringUtils.isNotBlank(patronymicName)) {
+            sb.append(' ').append(patronymicName.trim().charAt(0)).append('.');
+        }
+        return sb.toString();
     }
 }

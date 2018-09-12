@@ -36,9 +36,6 @@ public class Account {
     @NotNull
     private Float balance;
 
-    @Column
-    private Float blocked = 0f;
-
     // It's enough to compare 2 records by their id, because it's the primary key
     @Override
     public boolean equals(Object o) {

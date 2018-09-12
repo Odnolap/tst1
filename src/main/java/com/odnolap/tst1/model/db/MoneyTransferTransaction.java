@@ -1,6 +1,8 @@
 package com.odnolap.tst1.model.db;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
@@ -46,10 +48,12 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "transactions")
+@NoArgsConstructor
+@AllArgsConstructor
 public class MoneyTransferTransaction {
-    public static final String BY_ACCT_ID = "UsMoneyTransferTransactioner.getByAcctId";
-    public static final String BY_CUST_ID = "UsMoneyTransferTransactioner.getByCustId";
-    public static final String ALL = "UsMoneyTransferTransactioner.getAll";
+    public static final String BY_ACCT_ID = "MoneyTransferTransaction.getByAcctId";
+    public static final String BY_CUST_ID = "MoneyTransferTransaction.getByCustId";
+    public static final String ALL = "MoneyTransferTransaction.getAll";
 
     @Id
     @GeneratedValue
@@ -96,7 +100,7 @@ public class MoneyTransferTransaction {
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     @NotEmpty
-    private MoneyTransferTransactionStatus status = MoneyTransferTransactionStatus.CREATED;
+    private MoneyTransferTransactionStatus status;
 
     @Column
     private String description;
