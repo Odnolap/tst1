@@ -1,7 +1,8 @@
-DROP TABLE transactions IF EXISTS;
-DROP TABLE exchange_rates IF EXISTS;
-DROP TABLE accounts IF EXISTS;
-DROP TABLE customer IF EXISTS;
+-- not actual for in-memory db
+-- DROP TABLE transactions IF EXISTS;
+-- DROP TABLE exchange_rates IF EXISTS;
+-- DROP TABLE accounts IF EXISTS;
+-- DROP TABLE customers IF EXISTS;
 
 CREATE TABLE customers
 (
@@ -22,7 +23,7 @@ CREATE TABLE accounts
   id BIGINT AUTO_INCREMENT(16) PRIMARY KEY,
   customer_id BIGINT NOT NULL,
   currency VARCHAR(3) NOT NULL,
-  balance FLOAT,
+  balance DECIMAL(23,10),
   FOREIGN KEY ( customer_id ) REFERENCES customers ( id )
 )
 AS SELECT * FROM CSVREAD('classpath:db/populate_accounts.csv');
@@ -33,7 +34,7 @@ CREATE TABLE exchange_rates
   id BIGINT AUTO_INCREMENT(113) PRIMARY KEY,
   currency_from VARCHAR(3) NOT NULL,
   currency_to VARCHAR(3) NOT NULL,
-  rate FLOAT NOT NULL,
+  rate DECIMAL(23,10) NOT NULL,
   valid_from TIMESTAMP NOT NULL,
   valid_to TIMESTAMP
 )
@@ -45,9 +46,9 @@ CREATE TABLE transactions
   account_from_id BIGINT NOT NULL,
   account_to_id BIGINT NOT NULL,
   currency_from VARCHAR(3) NOT NULL,
-  amount_from FLOAT NOT NULL,
+  amount_from DECIMAL(23,10) NOT NULL,
   currency_to VARCHAR(3) NOT NULL,
-  amount_to FLOAT NOT NULL,
+  amount_to DECIMAL(23,10) NOT NULL,
   exchange_rate_id BIGINT NOT NULL,
   created TIMESTAMP DEFAULT now(),
   finalized TIMESTAMP,

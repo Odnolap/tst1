@@ -11,6 +11,7 @@ import org.hibernate.Transaction;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Singleton
@@ -42,7 +43,7 @@ public class AccountRepositoryDb implements AccountRepository {
     }
 
     @Override
-    public boolean moveMoneyBetweenAccounts(Long accountFromId, float amountFrom, Long accountToId, float amountTo) {
+    public boolean moveMoneyBetweenAccounts(Long accountFromId, BigDecimal amountFrom, Long accountToId, BigDecimal amountTo) {
         log.trace("Moving money (amounts {} -> {}) between accounts ({} -> {}) in DB.",
             amountFrom, amountTo, accountFromId, accountToId);
         Session session = sessionFactory.openSession();
@@ -52,16 +53,16 @@ public class AccountRepositoryDb implements AccountRepository {
             // LOCK and CHECK
             Account accountFrom = session.get(Account.class, accountFromId, LockMode.PESSIMISTIC_WRITE);
             session.refresh(accountFrom);
-            float balanceFrom = accountFrom.getBalance();
-            if (balanceFrom < amountFrom) {
+            BigDecimal balanceFrom = accountFrom.getBalance();
+            if (balanceFrom.compareTo(amountFrom) < 0) {
                 dbTransaction.rollback();
                 session.close();
                 return false;
             }
             Account accountTo = session.get(Account.class, accountToId, LockMode.PESSIMISTIC_WRITE);
             session.refresh(accountTo);
-            accountFrom.setBalance(balanceFrom - amountFrom);
-            accountTo.setBalance(accountTo.getBalance() + amountTo);
+            accountFrom.setBalance(balanceFrom.subtract(amountFrom));
+            accountTo.setBalance(accountTo.getBalance().add(amountTo));
             session.saveOrUpdate(accountFrom);
             session.saveOrUpdate(accountTo);
             session.flush();

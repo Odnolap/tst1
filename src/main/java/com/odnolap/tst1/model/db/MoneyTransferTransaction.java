@@ -20,6 +20,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @NamedQueries({
@@ -75,7 +76,7 @@ public class MoneyTransferTransaction {
 
     @Column(name = "amount_from", nullable = false)
     @NotNull
-    private Float amountFrom;
+    private BigDecimal amountFrom;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "currency_to", nullable = false)
@@ -84,7 +85,7 @@ public class MoneyTransferTransaction {
 
     @Column(name = "amount_to", nullable = false)
     @NotNull
-    private Float amountTo;
+    private BigDecimal amountTo;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "exchange_rate_id", nullable = false)

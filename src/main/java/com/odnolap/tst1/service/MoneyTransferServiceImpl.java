@@ -1,5 +1,6 @@
 package com.odnolap.tst1.service;
 
+import com.odnolap.tst1.helper.PropertiesHelper;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.GetTransactionsResponse;
 import com.odnolap.tst1.model.MoneyTransferRequest;
@@ -19,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +34,8 @@ import static com.odnolap.tst1.model.db.MoneyTransferTransactionStatus.SUCCESSFU
 @Singleton
 @Slf4j
 public class MoneyTransferServiceImpl implements MoneyTransferService {
+    private static final int BIG_DECIMAL_PRECISION = PropertiesHelper.getProperty("big.decimal.", 23);
+    private static final MathContext MATH_CONTEXT = new MathContext(BIG_DECIMAL_PRECISION);
 
     @Inject
     private MoneyTransferRepository moneyTransferRepository;
@@ -80,8 +85,8 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
 
     @Override
     public MoneyTransferTransactionDto createMoneyTransferTransaction(MoneyTransferRequest request) {
-        MoneyTransferTransaction newTransaction = null;
         Date transactionRegistered = new Date();
+        MoneyTransferTransaction newTransaction = null;
         String errMsg = null;
 
         try {
@@ -114,8 +119,8 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
                                 " that is valid for " + transactionRegistered + ". Transaction not created";
                             log.error(errMsg + ":\n{}", request);
                         } else {
-                            float amountFrom = request.getAmountFrom();
-                            float amountTo = amountFrom * exchangeRate.getRate();
+                            BigDecimal amountFrom = request.getAmountFrom();
+                            BigDecimal amountTo = amountFrom.multiply(exchangeRate.getRate(), MATH_CONTEXT);
                             String description;
                             MoneyTransferTransactionStatus status;
                             try {
@@ -128,7 +133,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
                                         + customerTo.getShortName() + ")";
                                     status = SUCCESSFUL;
                                 } else {
-                                    description = accountFrom.getBalance() < amountFrom
+                                    description = accountFrom.getBalance().compareTo(amountFrom) < 0
                                         ? "Insufficient funds."
                                         : "Error during moving money between accounts";
                                     status = REJECTED;

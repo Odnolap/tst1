@@ -16,6 +16,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @NamedQueries({
@@ -55,7 +56,7 @@ public class ExchangeRate {
 
     @Column(nullable = false)
     @NotNull
-    private Float rate;
+    private BigDecimal rate;
 
     @Column(name = "valid_from", nullable = false)
     @NotNull

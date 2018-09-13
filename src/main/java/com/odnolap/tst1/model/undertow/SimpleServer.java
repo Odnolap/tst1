@@ -37,7 +37,7 @@ public class SimpleServer {
              * If you base64 encode any cookie values you probably want it on.
              */
             .setServerOption(UndertowOptions.ALLOW_EQUALS_IN_COOKIE_VALUE, true)
-            .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 2000)
+            .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 1)
             .addHttpListener(PORT, HOST, handler)
             ;
         return new SimpleServer(undertow);

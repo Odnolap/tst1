@@ -1,4 +1,4 @@
-package com.odnolap.tst1.unitcommon;
+package com.odnolap.tst1.common;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

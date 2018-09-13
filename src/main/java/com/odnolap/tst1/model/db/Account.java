@@ -17,6 +17,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @NamedQueries({
     @NamedQuery(name = Account.ALL,
@@ -46,7 +47,7 @@ public class Account {
 
     @Column(nullable = false)
     @NotNull
-    private Float balance;
+    private BigDecimal balance;
 
     // It's enough to compare 2 records by their id, because it's the primary key
     @Override

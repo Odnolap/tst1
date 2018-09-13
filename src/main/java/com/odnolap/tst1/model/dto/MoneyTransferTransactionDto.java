@@ -6,6 +6,7 @@ import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -17,10 +18,10 @@ public class MoneyTransferTransactionDto {
     private Long customerToId;
     private Long accountToId;
     private Currency currencyFrom;
-    private Float amountFrom;
+    private BigDecimal amountFrom;
     private Currency currencyTo;
-    private Float amountTo;
-    private Float rate;
+    private BigDecimal amountTo;
+    private BigDecimal rate;
     private Date creationTimestamp;
     private Date finalizationTimestamp;
     private MoneyTransferTransactionStatus status;

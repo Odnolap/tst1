@@ -1,6 +1,6 @@
-How to buld: `mvn clean package`  
-How to run: `java -jar ./target/tst1-1.0-SNAPSHOT.jar `  
-How to shutdown: `curl -XGET localhost:8080/v1/quit` (for ease of use during testing)
+**How to buld**: `mvn clean package` or with skipping tests `mvn clean package -Dmaven.test.skip=true`  
+**How to run**: `java -jar ./target/tst1-1.0-SNAPSHOT.jar` Wait for message in log "Money transfer server started" (about 5 seconds).  
+**How to shutdown**: `curl -XGET localhost:8080/v1/quit` (for ease of use during testing)
 
 It's just a test server.  
 Try to get `localhost:8080/v1/transactions?accountId=11&page=0&offset=10`  
@@ -17,7 +17,7 @@ Available endpoints:
 - /v1/rates (GET)
 - /v1/rates/{id} (GET)
 
-Body content example for POST /v1/transactions request:
+So at present there is no possibility to update or delete any entity and add customer, account or exchange rate. You can only get entities and add a new transaction using POST request to `/v1/transactions` with body like this: 
 ```json
 {
   "accountFromId": 11,
@@ -26,3 +26,11 @@ Body content example for POST /v1/transactions request:
   "currencyTo": "USD"
 }
 ```
+Available 
+- customerIds: 1..3
+- accountIds: 11..15
+- currencies: USD, EUR, GBP, BTC
+- exchange rates for USD <-> EUR and USD <-> BTC operations
+
+2 unit tests: MoneyTransferServiceTest and MoneyTransferRepositoryTest
+1 integration test: Tst1IntegrationTest

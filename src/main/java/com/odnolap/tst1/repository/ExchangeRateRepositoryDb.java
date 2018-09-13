@@ -32,12 +32,13 @@ public class ExchangeRateRepositoryDb implements ExchangeRateRepository {
     public ExchangeRate getAppropriateRate(Date date, Currency currencyFrom, Currency currencyTo) {
         log.trace("Getting the latest exchange {} -> {} rate that valid for {}", currencyFrom, currencyTo, date);
         Session session = sessionFactory.openSession();
-        ExchangeRate exchangeRateList = session.createNamedQuery(ExchangeRate.BY_CURRENCIES_AND_DATE, ExchangeRate.class)
+        List<ExchangeRate> resultList = session.createNamedQuery(ExchangeRate.BY_CURRENCIES_AND_DATE, ExchangeRate.class)
             .setParameter("currencyFrom", currencyFrom)
             .setParameter("currencyTo", currencyTo)
             .setParameter("dt", date)
             .setMaxResults(1)
-            .getSingleResult();
+            .getResultList();
+        ExchangeRate exchangeRateList = resultList.isEmpty() ? null : resultList.get(0);
         session.close();
         return exchangeRateList;
     }

@@ -18,6 +18,7 @@ import io.undertow.server.handlers.accesslog.AccessLogHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.MimeMappings;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,8 @@ public class MoneyTransferRestServer {
     private static volatile boolean isServerRun;
     private static Injector injector;
     private static Undertow server;
+    // Keep this session opened because loss of all connections to in-memory H2 DB closes it
+    private static Session session;
 
     public static synchronized void startServer() {
         if (!isServerRun) {
@@ -37,6 +40,8 @@ public class MoneyTransferRestServer {
             CustomerService customerService = injector.getInstance(CustomerService.class);
             AccountService accountService = injector.getInstance(AccountService.class);
             ExchangeRateService exchangeRateService = injector.getInstance(ExchangeRateService.class);
+            SessionFactory sessionFactory = injector.getInstance(SessionFactory.class);
+            session = sessionFactory.openSession();
             HttpHandler root = initRoot(moneyTransferService, customerService, accountService, exchangeRateService);
             server = SimpleServer.simpleServer(root).start();
             isServerRun = true;
@@ -120,6 +125,7 @@ public class MoneyTransferRestServer {
 
     static void quit() throws SQLException, IOException {
         log.info("Stopping application.");
+        session.close();
         SessionFactory sessionFactory = injector.getInstance(SessionFactory.class);
         sessionFactory.close();
         server.stop();
