@@ -7,14 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class MoneyTransferRequest {
-    private Long accountFromId;
-    private Long customerToId;
-    private BigDecimal amountFrom;
+@AllArgsConstructor
+public class NewExchangeRateRequest {
+    private Currency currencyFrom;
     private Currency currencyTo;
+    private BigDecimal rate;
+    private Date validFrom;
+    private Date validTo;
 }

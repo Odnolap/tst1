@@ -14,6 +14,7 @@ import com.odnolap.tst1.service.MoneyTransferService;
 import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
+import io.undertow.server.handlers.BlockingHandler;
 import io.undertow.server.handlers.accesslog.AccessLogHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.MimeMappings;
@@ -63,7 +64,7 @@ public class MoneyTransferRestServer {
             + "- /v1/customers/{id} (GET)\n"
             + "- /v1/accounts (GET)\n"
             + "- /v1/accounts/{id} (GET)\n"
-            + "- /v1/rates (GET)\n"
+            + "- /v1/rates (GET, POST)\n"
             + "- /v1/rates/{id} (GET)\n"
             ;
 
@@ -105,13 +106,18 @@ public class MoneyTransferRestServer {
             .get("/v1/rates/{id}", HttpHandlerHelper.jsonHttpHandler(
                 exchange -> exchangeRateService.getExchangeRates(RequestHelper.createGetExchangeRatesRequest(exchange)))
             )
+            .post("/v1/rates", HttpHandlerHelper.jsonBlockingHttpHandler(
+                exchange -> exchangeRateService.createExchangeRate(RequestHelper.createNewRateRequest(exchange)),
+                201)
+            )
 
-            .get("/v1/quit", exchange -> {
+            // Stop application
+            .get("/v1/quit", new BlockingHandler(exchange -> {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE,
                     MimeMappings.DEFAULT_MIME_MAPPINGS.get("txt"));
                 exchange.getResponseSender().send("Application is stopped.\n");
                 quit();
-            })
+            }))
             .setFallbackHandler(HttpHandlerHelper::notFoundHandler)
             ;
 

@@ -10,7 +10,8 @@ import com.odnolap.tst1.model.GetAccountsRequest;
 import com.odnolap.tst1.model.GetCustomersRequest;
 import com.odnolap.tst1.model.GetExchangeRatesRequest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
-import com.odnolap.tst1.model.MoneyTransferRequest;
+import com.odnolap.tst1.model.NewExchangeRateRequest;
+import com.odnolap.tst1.model.NewMoneyTransferRequest;
 import com.odnolap.tst1.model.PageableRequest;
 import com.odnolap.tst1.model.exceptions.RequestParsingException;
 import io.undertow.server.HttpServerExchange;
@@ -39,9 +40,9 @@ public class RequestHelper {
         DEFAULT_OFFSET = PropertiesHelper.getProperty("default.offset", 10);
     }
 
-    private static final String ID = "id";
-    private static final String ACCOUNT_ID_PARAM = "accountId";
-    private static final String CUSTOMER_ID_PARAM = "customerId";
+    public static final String ID = "id";
+    public static final String ACCOUNT_ID_PARAM = "accountId";
+    public static final String CUSTOMER_ID_PARAM = "customerId";
     private static final String PAGE_NUMBER = "page";
     private static final String OFFSET = "offset";
 
@@ -162,8 +163,12 @@ public class RequestHelper {
         }
     }
 
-    public static MoneyTransferRequest createNewTransactionRequest(HttpServerExchange exchange) {
-        return getRequestBodyWithThrow(exchange, MoneyTransferRequest.class);
+    public static NewMoneyTransferRequest createNewTransactionRequest(HttpServerExchange exchange) {
+        return getRequestBodyWithThrow(exchange, NewMoneyTransferRequest.class);
+    }
+
+    public static NewExchangeRateRequest createNewRateRequest(HttpServerExchange exchange) {
+        return getRequestBodyWithThrow(exchange, NewExchangeRateRequest.class);
     }
 
     public static Deque<String> getParamValues(HttpServerExchange exchange, String paramName) {

@@ -75,25 +75,25 @@ public class MoneyTransferRepositoryDb implements MoneyTransferRepository {
         return transactionList;
     }
 
-    public MoneyTransferTransaction saveTransaction(MoneyTransferTransaction transaction) {
-        log.trace("Saving a transaction in DB.\n {}", transaction);
+    @Override
+    public MoneyTransferTransaction insertTransaction(MoneyTransferTransaction transaction) {
+        log.trace("Inserting a new transaction in DB.\n {}", transaction);
         Session session = sessionFactory.openSession();
         Transaction dbTransaction = null;
-        Long transactionId;
         try {
             dbTransaction = session.beginTransaction();
-            transactionId = (Long)session.save(transaction);
+            Long transactionId = (Long)session.save(transaction);
             dbTransaction.commit();
+            MoneyTransferTransaction newTransaction = getTransaction(transactionId, session);
+            session.close();
+            return newTransaction;
         } catch (HibernateException ex) {
             if (dbTransaction != null) {
                 dbTransaction.rollback();
             }
             session.close();
-            throw new DbPersistenceException("Error during saving a new transaction to DB.", ex);
+            throw new DbPersistenceException("Error during inserting a new transaction in DB.", ex);
         }
-        MoneyTransferTransaction newTransaction = getTransaction(transactionId, session);
-        session.close();
-        return newTransaction;
     }
 
 }

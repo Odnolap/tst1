@@ -1,12 +1,15 @@
 package com.odnolap.tst1.common;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odnolap.tst1.Application;
 import com.odnolap.tst1.helper.PropertiesHelper;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.Header;
 import io.restassured.specification.RequestSpecification;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
+import static com.odnolap.tst1.helper.undertow.RequestHelper.MAPPER;
 import static io.restassured.RestAssured.given;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -73,6 +76,19 @@ public abstract class BaseIntegrationTest {
             }
 
             return requestSpecification;
+        }
+
+        public RequestSpecification createTransactionRequest(Object requestBody) throws JsonProcessingException {
+            return transactionWithoutPaginationGet()
+                .header(new Header("Content-Type", "application/json"))
+                .body(MAPPER.writeValueAsString(requestBody));
+        }
+
+        public RequestSpecification createExchangeRateRequest(Object requestBody) throws JsonProcessingException {
+            return baseRequest()
+                .basePath("/v1/rates")
+                .header(new Header("Content-Type", "application/json"))
+                .body(MAPPER.writeValueAsString(requestBody));
         }
 
     }

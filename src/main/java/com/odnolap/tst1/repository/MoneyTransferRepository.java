@@ -14,6 +14,6 @@ public interface MoneyTransferRepository {
 
     List<MoneyTransferTransaction> getAllTransactions(int startFrom, int offset);
 
-    MoneyTransferTransaction saveTransaction(MoneyTransferTransaction transaction);
+    MoneyTransferTransaction insertTransaction(MoneyTransferTransaction transaction);
 
 }

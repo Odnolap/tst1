@@ -4,7 +4,7 @@ import com.odnolap.tst1.model.db.Currency;
 import com.odnolap.tst1.model.dto.MoneyTransferTransactionDto;
 import com.odnolap.tst1.common.BaseUnitTest;
 import com.odnolap.tst1.model.GetTransactionsRequest;
-import com.odnolap.tst1.model.MoneyTransferRequest;
+import com.odnolap.tst1.model.NewMoneyTransferRequest;
 import com.odnolap.tst1.model.db.MoneyTransferTransactionStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test
-    public void testGetAllTransactionsWithPagination() {
+    public void testGettingAllTransactionsWithPagination() {
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setOffset(10);
         List<MoneyTransferTransactionDto> actualTransactionList = service.getTransactions(request).getTransactions();
@@ -52,7 +52,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test
-    public void testGetTransactionsByAccountId() {
+    public void testGettingTransactionsByAccountId() {
         long expectedAccId = 11L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setAccountId(expectedAccId);
@@ -67,7 +67,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetTransactionsByNonExistingAccountId() {
+    public void testGettingTransactionsByNonExistingAccountId() {
         long expectedAccId = 999999L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setAccountId(expectedAccId);
@@ -76,7 +76,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test
-    public void testGetTransactionsByCustomerId() {
+    public void testGettingTransactionsByCustomerId() {
         long expectedCustomerId = 3L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setCustomerId(expectedCustomerId);
@@ -91,7 +91,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetTransactionsByNonExistingCustomerId() {
+    public void testGettingTransactionsByNonExistingCustomerId() {
         long expectedCustomerId = 999999L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setCustomerId(expectedCustomerId);
@@ -100,7 +100,7 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test
-    public void testGetTransactionsById() {
+    public void testGettingTransactionsById() {
         long expectedTransactionId = 1004L;
         GetTransactionsRequest request = new GetTransactionsRequest();
         request.setTransactionId(expectedTransactionId);
@@ -111,12 +111,12 @@ public class MoneyTransferServiceTest extends BaseUnitTest {
     }
 
     @Test
-    public void testCreateMoneyTransferTransaction() {
+    public void testCreatingMoneyTransferTransaction() {
         long expectedAccountFromId = 11L;
         long expectedCustomerToId = 2L;
         BigDecimal expectedAmountFrom = new BigDecimal(1000);
         Currency expectedCurrencyTo = Currency.USD;
-        MoneyTransferRequest request = new MoneyTransferRequest(expectedAccountFromId, expectedCustomerToId, expectedAmountFrom, expectedCurrencyTo);
+        NewMoneyTransferRequest request = new NewMoneyTransferRequest(expectedAccountFromId, expectedCustomerToId, expectedAmountFrom, expectedCurrencyTo);
         MoneyTransferTransactionDto response = service.createMoneyTransferTransaction(request);
         assertThat(response.getStatus(), is(MoneyTransferTransactionStatus.SUCCESSFUL));
         assertThat(response.getAccountFromId(), is(expectedAccountFromId));

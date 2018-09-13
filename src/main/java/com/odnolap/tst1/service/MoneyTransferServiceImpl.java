@@ -3,7 +3,7 @@ package com.odnolap.tst1.service;
 import com.odnolap.tst1.helper.PropertiesHelper;
 import com.odnolap.tst1.model.GetTransactionsRequest;
 import com.odnolap.tst1.model.GetTransactionsResponse;
-import com.odnolap.tst1.model.MoneyTransferRequest;
+import com.odnolap.tst1.model.NewMoneyTransferRequest;
 import com.odnolap.tst1.model.db.Account;
 import com.odnolap.tst1.model.db.Currency;
 import com.odnolap.tst1.model.db.Customer;
@@ -55,7 +55,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
             Long accountId = request.getAccountId();
             Account account = accountRepository.getAccount(accountId);
             if (account == null) {
-                throw new IllegalArgumentException("Account with id " + accountId + " doesn't exists. Transaction not created");
+                throw new IllegalArgumentException("Account with id " + accountId + " doesn't exist. Transaction wasn't created");
             } else {
                 transactions = moneyTransferRepository.getAccountTransactions(accountId, request.getStartFrom(), request.getOffset());
             }
@@ -63,7 +63,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
             Long customerId = request.getCustomerId();
             Customer customer = customerRepository.getCustomer(customerId);
             if (customer == null) {
-                throw new IllegalArgumentException("Customer with id " + customerId + " doesn't exists. Transaction not created");
+                throw new IllegalArgumentException("Customer with id " + customerId + " doesn't exist. Transaction wasn't created");
             } else {
                 transactions = moneyTransferRepository.getCustomerTransactions(customerId, request.getStartFrom(), request.getOffset());
             }
@@ -84,7 +84,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
     }
 
     @Override
-    public MoneyTransferTransactionDto createMoneyTransferTransaction(MoneyTransferRequest request) {
+    public MoneyTransferTransactionDto createMoneyTransferTransaction(NewMoneyTransferRequest request) {
         Date transactionRegistered = new Date();
         MoneyTransferTransaction newTransaction = null;
         String errMsg = null;
@@ -93,13 +93,13 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
             Long accountFromId = request.getAccountFromId();
             Account accountFrom = accountRepository.getAccount(accountFromId);
             if (accountFrom == null) {
-                errMsg = "Account with id " + accountFromId + " doesn't exists. Transaction not created";
+                errMsg = "Account with id " + accountFromId + " doesn't exist. Transaction wasn't created";
                 log.error(errMsg + ":\n{}", request);
             } else {
                 Long customerToId = request.getCustomerToId();
                 Customer customerTo = customerRepository.getCustomerWithAccounts(customerToId);
                 if (customerTo == null) {
-                    errMsg = "Customer with id " + customerToId + " doesn't exists. Transaction not created";
+                    errMsg = "Customer with id " + customerToId + " doesn't exist. Transaction wasn't created";
                     log.error(errMsg + ":\n{}", request);
                 } else {
                     Currency currencyTo = request.getCurrencyTo();
@@ -109,14 +109,14 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
                         .orElse(null);
                     if (accountTo == null) {
                         errMsg = "Account with currency " + currencyTo + " for customer with id "
-                            + customerToId + " doesn't exists. Transaction not created";
+                            + customerToId + " doesn't exist. Transaction wasn't created";
                         log.error(errMsg + ":\n{}", request);
                     } else {
                         Currency currencyFrom = accountFrom.getCurrency();
                         ExchangeRate exchangeRate = exchangeRateRepository.getAppropriateRate(transactionRegistered, currencyFrom, currencyTo);
                         if (exchangeRate == null) {
                             errMsg = "There is no appropriate exchange rate for " + currencyFrom + " -> " + currencyTo +
-                                " that is valid for " + transactionRegistered + ". Transaction not created";
+                                " that is valid for " + transactionRegistered + ". Transaction wasn't created";
                             log.error(errMsg + ":\n{}", request);
                         } else {
                             BigDecimal amountFrom = request.getAmountFrom();
@@ -159,7 +159,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
         MoneyTransferTransaction savedTransaction = null;
         if (newTransaction != null) {
             newTransaction.setFinalizationTimestamp(new Date());
-            savedTransaction = moneyTransferRepository.saveTransaction(newTransaction);
+            savedTransaction = moneyTransferRepository.insertTransaction(newTransaction);
         } else {
             MoneyTransferTransactionDto notSavedErrorResult = new MoneyTransferTransactionDto();
             notSavedErrorResult.setDescription(errMsg);

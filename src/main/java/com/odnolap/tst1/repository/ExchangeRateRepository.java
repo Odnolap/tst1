@@ -12,4 +12,8 @@ public interface ExchangeRateRepository {
     ExchangeRate getAppropriateRate(Date date, Currency currencyFrom, Currency currencyTo);
 
     List<ExchangeRate> getAllExchangeRates(int startFrom, int offset);
+
+    ExchangeRate insertExchangeRate(ExchangeRate rate);
+
+    ExchangeRate updateOldAndInsertNewRates(ExchangeRate oldExchangeRate, ExchangeRate newExchangeRate);
 }
