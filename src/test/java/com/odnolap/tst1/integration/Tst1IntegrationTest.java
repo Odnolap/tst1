@@ -9,10 +9,12 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Calendar;
 
 import static com.odnolap.tst1.helper.undertow.RequestHelper.ACCOUNT_ID_PARAM;
 import static com.odnolap.tst1.helper.undertow.RequestHelper.CUSTOMER_ID_PARAM;
 import static com.odnolap.tst1.helper.undertow.RequestHelper.ID;
+import static com.odnolap.tst1.helper.undertow.RequestHelper.MAPPER;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.contains;
@@ -30,7 +32,17 @@ public class Tst1IntegrationTest extends BaseIntegrationTest {
     private static final MathContext MC = new MathContext(23);
 
     @Test
-    public void testGettingAllTransactionsWithLogingResponse() {
+    public void testGettingAllTransactionsWithLogingResponse() throws JsonProcessingException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2018, Calendar.SEPTEMBER, 11, 1, 20, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        String expectedCreationTimestamp = MAPPER.writeValueAsString(calendar).replace("\"", "");
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.set(2018, Calendar.SEPTEMBER, 11, 1, 20, 1);
+        calendar2.set(Calendar.MILLISECOND, 0);
+        String expectedFinalizationTimestamp = MAPPER.writeValueAsString(calendar2).replace("\"", "");
+
         client.logResponse().transactionGet()
             .get()
             .then()
@@ -44,8 +56,8 @@ public class Tst1IntegrationTest extends BaseIntegrationTest {
             .body("transactions.find { it.id == 1006 }.currencyFrom", is("USD"))
             .body("transactions.find { it.id == 1006 }.currencyTo", is("USD"))
             .body("transactions.find { it.id == 1006 }.rate", is(1f))
-            .body("transactions.find { it.id == 1006 }.creationTimestamp", is("2018-09-10T22:20:00.000+0000"))
-            .body("transactions.find { it.id == 1006 }.finalizationTimestamp", is("2018-09-10T22:10:01.000+0000"))
+            .body("transactions.find { it.id == 1006 }.creationTimestamp", is(expectedCreationTimestamp))
+            .body("transactions.find { it.id == 1006 }.finalizationTimestamp.toString()", is(expectedFinalizationTimestamp))
             .body("transactions.find { it.id == 1006 }.status", is("SUCCESSFUL"))
             .body("transactions.find { it.id == 1006 }.description", is("transfer USD -> USD to other client (Melinda G.)"))
             ;

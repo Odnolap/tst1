@@ -1,4 +1,4 @@
-package com.odnolap.tst1.model.undertow;
+package com.odnolap.tst1.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

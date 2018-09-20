@@ -1,7 +1,7 @@
 package com.odnolap.tst1.helper.undertow;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odnolap.tst1.model.undertow.ErrorResponse;
+import com.odnolap.tst1.model.ErrorResponse;
 import com.odnolap.tst1.model.undertow.JsonHttpHandler;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;

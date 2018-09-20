@@ -44,7 +44,7 @@ ValidFrom must be null (recognized as NOW()) or >= NOW().
 If validTo is not null it must be greater than validFrom.
 
 For available ids for customers, accounts, rates and transactions see a request from corresponding GET v1/... endpoint.  
-Available currencies: USD, EUR, GBP, BTC
+Available currencies: USD, EUR, GBP, BTC  
 Available exchange rates for USD <-> EUR and USD <-> BTC operations
 
 There are some tests:  
