@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.2</lombok.version>
         <undertow.version>2.0.13.Final</undertow.version>
-        <jackson.version>2.9.6</jackson.version>
+        <jackson.version>2.9.8</jackson.version>
         <guice.version>4.2.0</guice.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.core.version>1.2.3</logback.core.version>
