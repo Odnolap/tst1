@@ -11,11 +11,11 @@
     <name>Test 1</name>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.2</lombok.version>
-        <undertow.version>2.0.13.Final</undertow.version>
-        <jackson.version>2.9.8</jackson.version>
+        <lombok.version>1.18.34</lombok.version>
+        <undertow.version>2.3.14.Final</undertow.version>
+        <jackson.version>2.17.2</jackson.version>
         <guice.version>4.2.0</guice.version>
         <slf4j.version>1.7.25</slf4j.version>
         <logback.core.version>1.2.3</logback.core.version>
@@ -135,15 +135,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -178,5 +179,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>
